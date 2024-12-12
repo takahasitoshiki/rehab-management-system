@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const connectDB = require("/Users/t.toshiki/Desktop/rehab-management-system/backend/src/config/db.js");
 const dotenv = require('dotenv');
 
 dotenv.config(); // 環境変数を読み込む
@@ -10,6 +11,13 @@ const app = express();
 app.use(cors({
     origin: 'http://localhost:5173', // Reactの開発サーバーURL
 }));
+
+// MongoDB に接続
+connectDB();
+
+app.get("/", (req, res) => {
+  res.send("Hello, MongoDB!");
+});
 
 // JSONを扱えるようにする
 app.use(express.json());
