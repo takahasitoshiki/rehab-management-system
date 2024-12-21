@@ -1,11 +1,10 @@
 const express = require('express');
 const session = require('express-session');
-// const authRoutes = require('./src/routes/authRoutes');
+const sessionConfig = require('./config/session');
 
 const app = express();
-app.use(express.json());
-app.use(session({ secret: 'mySecret', resave: false, saveUninitialized: true }));
 
-app.use('/auth', authRoutes);
+// ミドルウェアとしてセッションを設定
+app.use(session(sessionConfig));
 
 module.exports = app;
