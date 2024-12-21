@@ -28,7 +28,7 @@ app.get('/test', (req, res) => {
     res.json({ message: 'Hello from the backend!' });
 });
 
-// ユーザー登録APIにかんして
+// ユーザーセッション関連
 app.use(userRoutes);
 
 

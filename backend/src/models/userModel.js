@@ -28,5 +28,10 @@ userSchema.pre('save', async function (next) {
     next();    
 })
 
+// comparePassword メソッドを追加
+userSchema.methods.comparePassword = async function (candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
+  };
+  
 
 module.exports = mongoose.model('User', userSchema);
