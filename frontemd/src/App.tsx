@@ -1,14 +1,12 @@
-
-import './App.css'
-import Login from './pages/Login/Login'
+import AppRoutes from "../src/routes/routes";
+import "./App.css";
 
 function App() {
-
   return (
     <>
-      <Login></Login>
+      <AppRoutes />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

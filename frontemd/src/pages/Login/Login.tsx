@@ -17,11 +17,11 @@ const Login: React.FC = () => {
       <div className="logo-container">
         <div className="logo">
           <img
-            src={LoginIcon} // インポートした画像
+            src={LoginIcon} 
             alt="Login Icon"
             style={{
-              height: "150px",
-              width: "150px",
+              height: "200px",
+              width: "200px",
             }}
           />
         </div>
@@ -48,7 +48,7 @@ const Login: React.FC = () => {
         >
           <Input.Password placeholder="Enter your password" />
         </Form.Item>
-        <Form.Item>
+        <Form.Item style={{ marginTop: "30px" }}>
           <Button type="primary" htmlType="submit" block>
             LOGIN
           </Button>
