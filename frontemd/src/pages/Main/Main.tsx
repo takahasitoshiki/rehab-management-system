@@ -13,7 +13,7 @@ const scheduling: React.FC = () => {
   ];
 
   const patientData = [
-    { key: "1", code: "0111111111", name: "テスト 太郎", type: "リハ" },
+    { key: "1", code: "011111", name: "テスト 太郎", type: "リハ" },
   ];
 
   const scheduleColumns = [
