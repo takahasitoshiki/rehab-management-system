@@ -42,7 +42,7 @@ const loginUser = async (req, res) => {
     if (!username || !password) {
       return res
         .status(400)
-        .json({ message: "全てのフィールドを入力してください。" }); //不正リクエスト
+        .json({ message: "全てのフィールドを入力してください" }); //不正リクエスト
     }
 
     // ユーザーの検索

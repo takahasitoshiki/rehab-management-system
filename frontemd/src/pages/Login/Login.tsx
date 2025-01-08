@@ -1,12 +1,19 @@
 import React from "react";
 import LoginIcon from "../../img/icon/Login.png";
 import { Form, Input, Button } from "antd";
+import { login } from "../../sesrvies/auth";
 import "./Login.css";
 
 const Login: React.FC = () => {
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
-  };
+  const onFinish = async (values: {username: string; password: string}) => {
+    try{
+      const data = await login(values.username, values.password);
+      localStorage.setItem("token", data.token) //トークン保存
+      console.log("Login successful:", data);
+    } catch (error: any ){
+      console.error("Login failed:", error.response?.data || error.message)
+    }
+    };
 
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);
