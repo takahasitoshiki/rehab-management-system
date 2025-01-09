@@ -3,13 +3,16 @@ import LoginIcon from "../../img/icon/Login.png";
 import { Form, Input, Button } from "antd";
 import { login } from "../../sesrvies/auth";
 import "./Login.css";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
   const onFinish = async (values: {username: string; password: string}) => {
     try{
       const data = await login(values.username, values.password);
       localStorage.setItem("token", data.token) //トークン保存
       console.log("Login successful:", data);
+      navigate("/scheduling"); // ページ遷移
     } catch (error: any ){
       console.error("Login failed:", error.response?.data || error.message)
     }
