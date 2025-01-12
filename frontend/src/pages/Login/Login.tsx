@@ -1,7 +1,7 @@
 import React from "react";
-import LoginIcon from "../../img/icon/Login.png";
+import LoginIcon from "@/assets/icon/Login.png";
 import { Form, Input, Button } from "antd";
-import { login } from "../../sesrvies/auth";
+import { login } from "../../services/auth";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 
