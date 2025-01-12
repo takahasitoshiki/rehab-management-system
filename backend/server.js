@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./src/config/db.js');
-const userRoutes = require("./src/routes/authRoutes.js");
+const authRoutes = require("./src/routes/authRoutes.js");
+const patientRoutes = require("./src/routes/patientRoutes.js");
 const dotenv = require('dotenv');
 
 dotenv.config(); // 環境変数を読み込む
@@ -29,7 +30,10 @@ app.get('/test', (req, res) => {
 });
 
 // ユーザーセッション関連
-app.use(userRoutes);
+app.use('/api/users', authRoutes);
+
+// 患者登録関連
+app.use('/api/patients', patientRoutes);
 
 
 // サーバーの起動
