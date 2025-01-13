@@ -1,16 +1,17 @@
 import React from "react";
-import PatientIcon from "@/assets/icon/Patient.png";
-import PatientRegistration from "@/assets/icon/PatientRegistration.png";
-import Therapist from "@/assets/icon/Therapist.png";
-import Reservation_List from "@/assets/icon/Reservation_List.png";
-import Achievements from "@/assets/icon/Achievements.png";
-import update from "@/assets/icon/update.png";
-import Reset from "@/assets/icon/Reset.png";
-import Sending from "@/assets/icon/Sending.png";
+import {
+  PatientIcon,
+  PatientRegistration,
+  Therapist,
+  Reservation_List,
+  Achievements,
+  update,
+  Reset,
+  Sending,
+} from "@/assets/icon";
 import "../styles/CustomHeader.css";
 import { DatePicker } from "antd";
 import dayjs,{ Dayjs } from "dayjs"; 
-
 
 const getStartOfWeek = (): Dayjs => dayjs().startOf('week'); 
 const getEndOfWeek = (): Dayjs => dayjs().endOf('week'); 

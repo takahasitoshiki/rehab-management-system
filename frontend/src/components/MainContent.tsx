@@ -1,13 +1,17 @@
 import React from "react";
-import { Table } from "antd";
 import MainHeader from "./MainHeader";
+import PatientList from "./PatientList";
+import ScheduleList from "./ScheduleList";
+import AchievementList from "./AchievementList";
 
-const MainContent: React.FC<{
-  patientColumns: any;
-  patientData: any;
-  scheduleColumns: any;
-  scheduleData: any;
-}> = ({ patientColumns, patientData, scheduleColumns, scheduleData }) => {
+  const MainContent: React.FC = () => {
+
+    const sectionStyle: React.CSSProperties = {
+      flex: 1,
+      border: "1px solid #ccc",
+      borderRadius: "5px",
+      padding: "10px",
+    };
 
     const handleClose = () => {
         console.log("閉じるボタンがクリックされました");
@@ -18,23 +22,23 @@ const MainContent: React.FC<{
       };
 
   return (
-    <div style={{ padding: "20px", display: "flex", gap: "10px" }}>
+    <div style={{ display: "flex", gap: "10px", width: "100%"}}>
       {/* 患者一覧 */}
-      <div style={{ flex: 1, border: "1px solid #ccc", borderRadius: "5px", padding: "10px" }}>
-      <MainHeader title="患者一覧" onClose={handleClose} onMaximize={handleMaximize} />
-      <Table columns={patientColumns} dataSource={patientData} pagination={false} />
+      <div style={{ ...sectionStyle, flex: 1 }}>
+      <MainHeader title="患者一覧" onClose={handleClose}/>
+        <PatientList />
       </div>
 
       {/* 予約一覧 */}
-      <div style={{ flex: 1, border: "1px solid #ccc", borderRadius: "5px", padding: "10px" }}>
+      <div style={{ ...sectionStyle, flex: 1 }}>
       <MainHeader title="予約一覧" onClose={handleClose} onMaximize={handleMaximize} />
-        <Table columns={scheduleColumns} dataSource={scheduleData} pagination={false} />
+        <ScheduleList/>
       </div>
 
       {/* 実績一覧 */}
-      <div style={{ flex: 1, border: "1px solid #ccc", borderRadius: "5px", padding: "10px" }}>
+      <div style={{ ...sectionStyle, flex: 1 }}>
       <MainHeader title="実績一覧" onClose={handleClose} onMaximize={handleMaximize} />
-        <Table columns={scheduleColumns} dataSource={scheduleData} pagination={false} />
+        <AchievementList/>
       </div>
     </div>
   );
