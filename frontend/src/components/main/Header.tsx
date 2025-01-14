@@ -9,7 +9,7 @@ import {
   Reset,
   Sending,
 } from "@/assets/icon";
-import "../styles/CustomHeader.css";
+import "../../pages/Main/CustomHeader.css";
 import { DatePicker } from "antd";
 import dayjs,{ Dayjs } from "dayjs"; 
 

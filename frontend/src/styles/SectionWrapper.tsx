@@ -4,10 +4,11 @@ const sectionStyle: React.CSSProperties = {
   flex: 1,
   border: "1px solid #ccc",
   borderRadius: "5px",
-  margin: "10px",
-  padding: "10px", // 必要に応じて追加
   backgroundColor: "#fff", // 必要に応じて追加
+  height: "95%", 
+  overflow: "auto"
 };
+
 
 interface SectionWrapperProps {
   children: React.ReactNode; // 子要素を受け取る

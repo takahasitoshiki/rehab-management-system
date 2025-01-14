@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import Login from "../pages/Login/Login";
 import Scheduling from "../pages/Main/Main";
-import PrivateRoute from "../components/PrivateRoute";
+// import PrivateRoute from "../components/PrivateRoute";
 
 const AppRoutes: React.FC = () => {
   return (

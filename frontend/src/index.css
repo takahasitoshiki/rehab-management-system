@@ -6,3 +6,11 @@ body {
   padding: 0;
   box-sizing: border-box;
 }
+.custom-table .ant-table-cell {
+  padding: 0 10px !important; 
+}
+
+.custom-table .ant-table-thead > tr > th,
+.custom-table .ant-table-tbody > tr > td {
+  padding: 0 10px !important; 
+}

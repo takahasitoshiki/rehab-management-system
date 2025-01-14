@@ -1,7 +1,7 @@
 import React from "react";
 import { Layout } from "antd";
-import CustomHeader from "../../components/Header";
-import MainContent from "../../components/MainContent"
+import CustomHeader from "../../components/main/Header";
+import MainContent from "../../components/main/MainContent"
 
 
 const { Content } = Layout;
@@ -13,7 +13,7 @@ const scheduling: React.FC = () => {
       {/* ヘッダー */}
       <CustomHeader/>
       {/* メインコンテンツ */}
-      <Content style={{ padding: "10px", display: "flex", gap: "10px" }}>
+      <Content style={{ padding: "5px", display: "flex"}}>
       <MainContent/>
       </Content>
     </Layout>

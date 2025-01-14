@@ -1,8 +1,8 @@
 import React from "react";
 import MainHeader from "./MainHeader";
-import PatientList from "./PatientList";
-import ScheduleList from "./ScheduleList";
-import AchievementList from "./AchievementList";
+import PatientList from "./PatientList/PatientList";
+import ScheduleList from "./ScheduleList/ScheduleList";
+import AchievementList from "./AchievementList/AchievementList";
 
   const MainContent: React.FC = () => {
 
@@ -10,7 +10,7 @@ import AchievementList from "./AchievementList";
       flex: 1,
       border: "1px solid #ccc",
       borderRadius: "5px",
-      padding: "10px",
+      padding: "5px",
     };
 
     const handleClose = () => {
@@ -22,7 +22,7 @@ import AchievementList from "./AchievementList";
       };
 
   return (
-    <div style={{ display: "flex", gap: "10px", width: "100%"}}>
+    <div style={{ display: "flex", width: "100%"}}>
       {/* 患者一覧 */}
       <div style={{ ...sectionStyle, flex: 1 }}>
       <MainHeader title="患者一覧" onClose={handleClose}/>
