@@ -1,12 +1,14 @@
 import React from "react";
 import { Table } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
+import { scheduleColumns, RowType } from "../../../constants/scheduleColumns";
+
 
 const AchievementList: React.FC = () => {
   const generateTimeSlots = () => {
     const startHour = 9;
     const endHour = 18; 
-    const timeSlots = [];
+    const timeSlots: RowType[] = [];
 
     for (let hour = startHour; hour <= endHour; hour++) {
       for (let minute of [0, 20, 40]) {
@@ -22,34 +24,6 @@ const AchievementList: React.FC = () => {
     return timeSlots;
   };
 
-  // カラム設定
-  const columns = [
-    {
-      dataIndex: "hour",
-      key: "hour",
-      width: 50,
-      render: (value, row, index) => {
-        const rowSpan = index % 3 === 0 ? 3 : 0; // 3行ごとに時間をマージ
-        return {
-          children: value,
-          props: {
-            rowSpan,
-          },
-        };
-      },
-    },
-    {
-      dataIndex: "minute",
-      key: "minute",
-      width: 50,
-    },
-    {
-      dataIndex: "patient",
-      key: "patient",
-      width: 200,
-    },
-  ];
-
   // データソース
   const dataSource = generateTimeSlots();
 
@@ -57,7 +31,7 @@ const AchievementList: React.FC = () => {
     <SectionWrapper>
       <Table
         className="custom-table"
-        columns={columns}
+        columns={scheduleColumns}
         dataSource={dataSource}
         pagination={false}
         bordered
