@@ -7,7 +7,7 @@ export interface TimeSlot {
   
   export const generateTimeSlots = (): TimeSlot[] => {
     const startHour = 9;
-    const endHour = 18;
+    const endHour = 17;
     const timeSlots: TimeSlot[] = [];
   
     for (let hour = startHour; hour <= endHour; hour++) {
