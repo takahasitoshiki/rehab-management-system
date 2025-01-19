@@ -11,6 +11,13 @@ import {
 } from "@/assets/icon";
 import "../../pages/Main/CustomHeader.css";
 import { DatePicker, Modal, Button } from "antd";
+import PatientRegistrationContent from "../../components/main/headerBtnComponent/PatientRegistrationContent";
+// import PatientListContent from "../../components/main/headerBtnComponent/PatientListContent";
+// import TherapistContent from "../../components/main/headerBtnComponent/TherapistContent";
+// import ReservationListContent from "../../components/main/headerBtnComponent/ReservationListContent";
+// import AchievementsContent from "../../components/main/headerBtnComponent/AchievementsContent";
+// import SyncContent from "../../components/main/headerBtnComponent/SyncContent";
+// import ResetContent from "../../components/main/headerBtnComponent/ResetContent";
 import dayjs, { Dayjs } from "dayjs";
 
 const getStartOfWeek = (): Dayjs => dayjs().startOf("week");
@@ -18,9 +25,48 @@ const getEndOfWeek = (): Dayjs => dayjs().endOf("week");
 
 const CustomHeader: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalContent, setModalContent] = useState('');
+  const [modalContent, setModalContent] = useState<React.ReactNode>(null);
 
-  const handleIconClick = (content: string) => {
+  const buttonData = [
+    {
+      iconSrc: PatientRegistration,
+      altText: "患者登録",
+      modalContent: <PatientRegistrationContent />,
+    },
+    {
+      iconSrc: PatientIcon,
+      altText: "患者一覧",
+      modalContent: <PatientRegistrationContent />,
+    },
+    {
+      iconSrc: Therapist,
+      altText: "セラピスト登録",
+      modalContent: <PatientRegistrationContent />,
+    },
+    {
+      iconSrc: Reservation_List,
+      altText: "予約一覧",
+      modalContent: <PatientRegistrationContent />,
+    },
+    {
+      iconSrc: Achievements,
+      altText: "実績一覧",
+      modalContent: <PatientRegistrationContent />,
+    },
+    {
+      iconSrc: update,
+      altText: "同期",
+      modalContent: <PatientRegistrationContent />,
+    },
+    {
+      iconSrc: Reset,
+      altText: "終了",
+      modalContent: <PatientRegistrationContent />,
+    },
+  ];
+
+  const handleIconClick = (content: React.ReactNode) => {
+    console.log("Modal triggered");
     setModalContent(content); // モーダルに表示する内容を設定
     setIsModalVisible(true); // モーダルを表示
   };
@@ -33,7 +79,6 @@ const CustomHeader: React.FC = () => {
     setIsModalVisible(false); // モーダルを閉じる
   };
 
-
   const { RangePicker } = DatePicker;
   const handleDateChange = (
     dates: [Dayjs | null, Dayjs | null] | null,
@@ -45,48 +90,15 @@ const CustomHeader: React.FC = () => {
   return (
     <div className="header-container">
       <div className="icon-group">
-        <img
-          src={PatientRegistration}
-          alt="患者登録"
-          className="icon"
-          onClick={() => handleIconClick("患者登録")}
-        />
-        <img
-          src={PatientIcon}
-          alt="患者一覧"
-          className="icon"
-          onClick={() => handleIconClick("患者一覧")}
-        />
-        <img
-          src={Therapist}
-          alt="セラピスト登録"
-          className="icon"
-          onClick={() => handleIconClick("セラピスト登録")}
-        />
-        <img
-          src={Reservation_List}
-          alt="予約一覧"
-          className="icon"
-          onClick={() => handleIconClick("予約一覧")}
-        />
-        <img
-          src={Achievements}
-          alt="実績一覧"
-          className="icon"
-          onClick={() => handleIconClick("実績一覧")}
-        />
-        <img
-          src={update}
-          alt="同期"
-          className="icon"
-          onClick={() => handleIconClick("同期")}
-        />
-        <img
-          src={Reset}
-          alt="終了"
-          className="icon"
-          onClick={() => handleIconClick("終了")}
-        />
+        {buttonData.map((button, index) => (
+          <img
+            key={index}
+            src={button.iconSrc}
+            alt={button.altText}
+            className="icon"
+            onClick={() => handleIconClick(button.modalContent)}
+          />
+        ))}
       </div>
       <div className="input-group">
         <label htmlFor="period">期間</label>
@@ -106,24 +118,14 @@ const CustomHeader: React.FC = () => {
 
       {/* ダイアログの表示 */}
       <Modal
-        title="詳細情報"
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        footer={[
-          <Button key="back" onClick={handleCancel}>
-            キャンセル
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleOk}>
-            OK
-          </Button>,
-        ]}
+        footer={null} // フッターを非表示にする
       >
-        <p>{modalContent}</p>
+        {modalContent}
       </Modal>
-
     </div>
-
   );
 };
 
