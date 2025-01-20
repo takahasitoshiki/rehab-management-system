@@ -4,7 +4,7 @@ const sectionStyle: React.CSSProperties = {
   flex: 1,
   border: "1px solid #ccc",
   borderRadius: "5px",
-  backgroundColor: "#fff", // 必要に応じて追加
+  backgroundColor: "#fff", 
   height: "95%", 
   overflow: "auto"
 };

@@ -1,45 +1,83 @@
-import React from "react";
+import React, { useState } from "react";
 import MainHeader from "./MainHeader";
 import PatientList from "./PatientList/PatientList";
 import ScheduleList from "./ScheduleList/ScheduleList";
 import AchievementList from "./AchievementList/AchievementList";
 
-  const MainContent: React.FC = () => {
+const MainContent: React.FC = () => {
+  const [visibleSections, setVisibleSections] = useState({
+    patients: true,
+    schedules: true,
+    achievements: true,
+  });
 
-    const sectionStyle: React.CSSProperties = {
-      flex: 1,
-      border: "1px solid #ccc",
-      borderRadius: "5px",
-      padding: "5px",
-    };
+  const [maximizedSection, setMaximizedSection] = useState<"patients" | "schedules" | "achievements" | null> (null)
 
-    const handleClose = () => {
-        console.log("閉じるボタンがクリックされました");
-      };
-    
-      const handleMaximize = () => {
-        console.log("画面を最大化します");
-      };
+  const baseSectionStyle: React.CSSProperties = {
+    flex: 1,
+    border: "1px solid #ccc",
+    borderRadius: "5px",
+    padding: "3px",
+    transition: "flex 0.3s ease, width 0.3s ease, opacity 0.3s ease", // トランジションを設定
+  };
 
+  const handleClose = (section: "patients" | "schedules" | "achievements") => {
+    setVisibleSections((prev) => ({ ...prev, [section]: false }));
+  };
+
+  const handleMaximize = (
+    section: "patients" | "schedules" | "achievements"
+  ) => {
+    setMaximizedSection((prev) => (prev === section ? null : section));
+  };
+
+  const getSectionStyle = (section: "patients" | "schedules" | "achievements") => {
+    if (maximizedSection === section) {
+      return { ...baseSectionStyle}; // 最大化スタイル
+    }
+    if (maximizedSection) {
+      return { ...baseSectionStyle, flex: 0, width: "0", opacity: 0, overflow: "hidden" }; 
+    }
+    return baseSectionStyle; // 通常スタイル
+  };
+  
   return (
-    <div style={{ display: "flex", width: "100%"}}>
+    <div style={{ display: "flex", width: "100%" }}>
+
       {/* 患者一覧 */}
-      <div style={{ ...sectionStyle, flex: 1 }}>
-      <MainHeader title="患者一覧" onClose={handleClose}/>
+      {visibleSections.patients && (
+      <div style={getSectionStyle("patients")}>
+        <MainHeader title="患者一覧" onClose={() => handleClose("patients")} />
         <PatientList />
       </div>
+      )}
+
 
       {/* 予約一覧 */}
-      <div style={{ ...sectionStyle, flex: 1 }}>
-      <MainHeader title="予約一覧" onClose={handleClose} onMaximize={handleMaximize} />
-        <ScheduleList/>
+      {visibleSections.schedules && (
+      <div style={getSectionStyle("schedules")}>
+        <MainHeader
+          title="予約一覧"
+          onClose={() => handleClose("schedules")}
+          onMaximize={() => handleMaximize("schedules")}
+        />
+        <ScheduleList />
       </div>
+      )}
+
 
       {/* 実績一覧 */}
-      <div style={{ ...sectionStyle, flex: 1 }}>
-      <MainHeader title="実績一覧" onClose={handleClose} onMaximize={handleMaximize} />
-        <AchievementList/>
+      {visibleSections.achievements && (
+      <div style={getSectionStyle("achievements")}>
+        <MainHeader
+          title="実績一覧"
+          onClose={() => handleClose("achievements")}
+          onMaximize={() => handleMaximize("achievements")}
+        />
+        <AchievementList />
       </div>
+    )}
+
     </div>
   );
 };

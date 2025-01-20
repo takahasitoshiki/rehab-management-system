@@ -10,7 +10,7 @@ import {
   Sending,
 } from "@/assets/icon";
 import "../../pages/Main/CustomHeader.css";
-import { DatePicker, Modal, Button } from "antd";
+import { DatePicker, Modal } from "antd";
 import PatientRegistrationContent from "../../components/main/headerBtnComponent/PatientRegistrationContent";
 // import PatientListContent from "../../components/main/headerBtnComponent/PatientListContent";
 // import TherapistContent from "../../components/main/headerBtnComponent/TherapistContent";
@@ -20,14 +20,41 @@ import PatientRegistrationContent from "../../components/main/headerBtnComponent
 // import ResetContent from "../../components/main/headerBtnComponent/ResetContent";
 import dayjs, { Dayjs } from "dayjs";
 
+
+type ButtonData =
+  | {
+      iconSrc: string;
+      altText: string;
+      sectionKey: "patients" | "schedules" | "achievements"; // sectionKeyがある場合
+      modalContent: React.ReactNode;
+    }
+  | {
+      iconSrc: string;
+      altText: string;
+      sectionKey?: undefined; // sectionKeyがない場合
+      modalContent: React.ReactNode;
+    };
+
+
 const getStartOfWeek = (): Dayjs => dayjs().startOf("week");
 const getEndOfWeek = (): Dayjs => dayjs().endOf("week");
 
-const CustomHeader: React.FC = () => {
+interface CustomHeaderProps {
+  setVisibleSections: React.Dispatch<
+    React.SetStateAction<{
+      patients: boolean;
+      schedules: boolean;
+      achievements: boolean;
+    }>
+  >;
+}
+
+const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
 
-  const buttonData = [
+  const buttonData: ButtonData = [
     {
       iconSrc: PatientRegistration,
       altText: "患者登録",
@@ -36,6 +63,7 @@ const CustomHeader: React.FC = () => {
     {
       iconSrc: PatientIcon,
       altText: "患者一覧",
+      sectionKey: "patients",
       modalContent: <PatientRegistrationContent />,
     },
     {
@@ -46,11 +74,13 @@ const CustomHeader: React.FC = () => {
     {
       iconSrc: Reservation_List,
       altText: "予約一覧",
+      sectionKey: "schedules",
       modalContent: <PatientRegistrationContent />,
     },
     {
       iconSrc: Achievements,
       altText: "実績一覧",
+      sectionKey: "achievements",
       modalContent: <PatientRegistrationContent />,
     },
     {
@@ -65,14 +95,27 @@ const CustomHeader: React.FC = () => {
     },
   ];
 
-  const handleIconClick = (content: React.ReactNode) => {
-    console.log("Modal triggered");
-    setModalContent(content); // モーダルに表示する内容を設定
-    setIsModalVisible(true); // モーダルを表示
+  const handleIconClick = (
+    sectionKey: "patients" | "schedules" | "achievements" | undefined,
+    content: React.ReactNode
+  ) => {
+    if (sectionKey) {
+      // セクションを表示
+      setVisibleSections((prev) => ({
+        ...prev,
+        [sectionKey]: true,
+      }));
+    } else {
+      console.log("セクションキーがありません。モーダルのみを表示します。");
+    }
+  
+    // モーダルの表示
+    setModalContent(content);
+    setIsModalVisible(true);
   };
 
   const handleOk = () => {
-    setIsModalVisible(false); // モーダルを閉じる
+    setIsModalVisible(false); // モーダルを開く
   };
 
   const handleCancel = () => {
@@ -90,13 +133,13 @@ const CustomHeader: React.FC = () => {
   return (
     <div className="header-container">
       <div className="icon-group">
-        {buttonData.map((button, index) => (
+      {buttonData.map((button: ButtonData, index: number) => (
           <img
             key={index}
             src={button.iconSrc}
             alt={button.altText}
             className="icon"
-            onClick={() => handleIconClick(button.modalContent)}
+            onClick={() => handleIconClick(button.sectionKey, button.modalContent)}
           />
         ))}
       </div>
