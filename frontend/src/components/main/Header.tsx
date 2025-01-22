@@ -20,21 +20,12 @@ import PatientRegistrationContent from "../../components/main/headerBtnComponent
 // import ResetContent from "../../components/main/headerBtnComponent/ResetContent";
 import dayjs, { Dayjs } from "dayjs";
 
-
-type ButtonData =
-  | {
-      iconSrc: string;
-      altText: string;
-      sectionKey: "patients" | "schedules" | "achievements"; // sectionKeyがある場合
-      modalContent: React.ReactNode;
-    }
-  | {
-      iconSrc: string;
-      altText: string;
-      sectionKey?: undefined; // sectionKeyがない場合
-      modalContent: React.ReactNode;
-    };
-
+type ButtonData = {
+  iconSrc: string;
+  altText: string;
+  modalContent?: React.ReactNode;
+  sectionKey?: "patients" | "schedules" | "achievements"; // sectionKeyがある場合
+};
 
 const getStartOfWeek = (): Dayjs => dayjs().startOf("week");
 const getEndOfWeek = (): Dayjs => dayjs().endOf("week");
@@ -49,12 +40,13 @@ interface CustomHeaderProps {
   >;
 }
 
-const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
-
+const CustomHeader: React.FC<CustomHeaderProps> = ({
+  setVisibleSections,
+}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
 
-  const buttonData: ButtonData = [
+  const buttonData: ButtonData[] = [
     {
       iconSrc: PatientRegistration,
       altText: "患者登録",
@@ -64,7 +56,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
       iconSrc: PatientIcon,
       altText: "患者一覧",
       sectionKey: "patients",
-      modalContent: <PatientRegistrationContent />,
     },
     {
       iconSrc: Therapist,
@@ -101,17 +92,19 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
   ) => {
     if (sectionKey) {
       // セクションを表示
+      console.log("sectionKey:", sectionKey);
       setVisibleSections((prev) => ({
         ...prev,
         [sectionKey]: true,
       }));
-    } else {
-      console.log("セクションキーがありません。モーダルのみを表示します。");
+      return;
     }
-  
-    // モーダルの表示
-    setModalContent(content);
-    setIsModalVisible(true);
+    // セクションキーがない場合はモーダルを表示
+    console.log("セクションキーがありません。モーダルを表示します。");
+    if (content) {
+      setModalContent(content);
+      setIsModalVisible(true);
+    }
   };
 
   const handleOk = () => {
@@ -133,13 +126,15 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
   return (
     <div className="header-container">
       <div className="icon-group">
-      {buttonData.map((button: ButtonData, index: number) => (
+        {buttonData.map((button: ButtonData, index: number) => (
           <img
             key={index}
             src={button.iconSrc}
             alt={button.altText}
             className="icon"
-            onClick={() => handleIconClick(button.sectionKey, button.modalContent)}
+            onClick={() =>
+              handleIconClick(button.sectionKey, button.modalContent)
+            }
           />
         ))}
       </div>

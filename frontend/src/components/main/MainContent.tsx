@@ -1,17 +1,34 @@
-import React, { useState } from "react";
+import React from "react";
 import MainHeader from "./MainHeader";
 import PatientList from "./PatientList/PatientList";
 import ScheduleList from "./ScheduleList/ScheduleList";
 import AchievementList from "./AchievementList/AchievementList";
 
-const MainContent: React.FC = () => {
-  const [visibleSections, setVisibleSections] = useState({
-    patients: true,
-    schedules: true,
-    achievements: true,
-  });
 
-  const [maximizedSection, setMaximizedSection] = useState<"patients" | "schedules" | "achievements" | null> (null)
+interface MainContentProps {
+  visibleSections: {
+    patients: boolean;
+    schedules: boolean;
+    achievements: boolean;
+  };
+  maximizedSection: "patients" | "schedules" | "achievements" | null;
+  setVisibleSections: React.Dispatch<
+    React.SetStateAction<{
+      patients: boolean;
+      schedules: boolean;
+      achievements: boolean;
+    }>
+  >;
+  setMaximizedSection: React.Dispatch<
+    React.SetStateAction<"patients" | "schedules" | "achievements" | null>
+  >;
+}
+
+const MainContent: React.FC<MainContentProps> = ({
+  visibleSections,
+  setVisibleSections,
+  setMaximizedSection,
+}) =>{
 
   const baseSectionStyle: React.CSSProperties = {
     flex: 1,
@@ -28,17 +45,22 @@ const MainContent: React.FC = () => {
   const handleMaximize = (
     section: "patients" | "schedules" | "achievements"
   ) => {
-    setMaximizedSection((prev) => (prev === section ? null : section));
+    setMaximizedSection(section); // 最大化するセクションを設定
+  
+    // 他のセクションを非表示にし、対象セクションを最大化
+    setVisibleSections({
+      patients: section === "patients",
+      schedules: section === "schedules",
+      achievements: section === "achievements",
+    });
   };
-
+  
   const getSectionStyle = (section: "patients" | "schedules" | "achievements") => {
-    if (maximizedSection === section) {
-      return { ...baseSectionStyle}; // 最大化スタイル
-    }
-    if (maximizedSection) {
-      return { ...baseSectionStyle, flex: 0, width: "0", opacity: 0, overflow: "hidden" }; 
-    }
-    return baseSectionStyle; // 通常スタイル
+    return {
+      ...baseSectionStyle,
+      flex: visibleSections[section] ? 1 : 0, // 表示状態に応じてサイズを変更
+      transition: "flex 0.3s ease", // スムーズな遷移を適用
+    };
   };
   
   return (
