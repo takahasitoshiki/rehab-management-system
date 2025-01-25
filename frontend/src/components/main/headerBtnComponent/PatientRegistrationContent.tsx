@@ -1,16 +1,25 @@
 import React from "react";
 import { Form, Input, Select, DatePicker, Button, message, Row, Col } from "antd";
 import dayjs from "dayjs";
+import { Patient, fetchPatientsRegister } from "@/services/patients/fetchPatients";
+
 
 const { Option } = Select;
 
 const PatientRegistrationContent: React.FC = () => {
   const [form] = Form.useForm();
 
-  const handleSubmit = (values: string) => {
-    console.log("登録された患者情報:", values);
-    message.success("患者情報が登録されました！");
-    form.resetFields(); // フォームをリセット
+  const handleSubmit = async (values: Patient) => {
+    try{
+      const response = await fetchPatientsRegister(values);
+      console.log("登録された患者情報:", response);
+      // 成功メッセージを表示
+      message.success("患者情報が登録されました。")
+      form.resetFields();
+    }catch(error){
+      console.error("登録エラー:"+ error)
+      message.error("患者情報の登録に失敗しました。");
+    }
   };
 
   return (
