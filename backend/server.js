@@ -3,6 +3,7 @@ const cors = require('cors');
 const connectDB = require('./src/config/db.js');
 const authRoutes = require("./src/routes/authRoutes.js");
 const patientRoutes = require("./src/routes/patientRoutes.js");
+const reservationController = require("./src/routes/reservationsRouter.js");
 const dotenv = require('dotenv');
 
 dotenv.config(); // 環境変数を読み込む
@@ -34,6 +35,9 @@ app.use('/api/users', authRoutes);
 
 // 患者登録関連
 app.use('/api/patients', patientRoutes);
+
+// 患者登録関連
+app.use('/api/reservation', reservationController);
 
 
 // サーバーの起動

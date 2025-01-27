@@ -4,25 +4,25 @@ const jwt = require("jsonwebtoken");
 
 // ユーザー登録
 const registerUser = async (req, res) => {
-  const { username, password } = req.body;
+  const { therapist_id, username, password } = req.body;
 
   try {
     // 入力データのバリデーション
-    if (!username || !password) {
+    if (!therapist_id ||!username || !password) {
       return res
         .status(400)
         .json({ message: "全てのフィールドを入力してください。" }); //不正リクエスト
     }
 
     // ユーザーがすでに存在していないか確認
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ therapist_id });
     if (existingUser) {
       return res
         .status(404)
         .json({ message: "このユーザーはすでに登録済みです。" }); //ユーザーが登録済みの場合
     }
 
-    const newUser = new User({ username, password });
+    const newUser = new User({ therapist_id, username, password });
     await newUser.save();
 
     // ユーザー登録成功
