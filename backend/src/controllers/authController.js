@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 
 // ユーザー登録
-const registerUser = async (req, res) => {
+exports.registerUser = async (req, res) => {
   const { therapist_id, username, password } = req.body;
 
   try {
@@ -34,7 +34,7 @@ const registerUser = async (req, res) => {
 };
 
 // ユーザーログイン
-const loginUser = async (req, res) => {
+exports.loginUser = async (req, res) => {
   const { username, password } = req.body;
 
   try {
@@ -79,4 +79,20 @@ const loginUser = async (req, res) => {
       });
   }
 };
-module.exports = { registerUser, loginUser };
+
+// ユーザー取得
+exports.getAllUser =async (req, res) => {
+  try {
+    const users = await User.find({},"therapist_id username" ); 
+    if (!users || users.length === 0){
+      return res.status(404).json({ error: "ユーザーが見つかりません"})
+    }
+    res
+      .status(200)
+      .json(users);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "ユーザーの取得に失敗しました。" });
+  }
+};

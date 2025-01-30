@@ -83,29 +83,6 @@ const ScheduleList: React.FC = () => {
         cancelText="キャンセル"
       >
         <Form form={form} layout="vertical">
-          {/* 患者名 */}
-          <Form.Item
-            name="patientName"
-            label="患者名"
-            rules={[{ required: true, message: "患者名を入力してください。" }]}
-          >
-            <Input placeholder="患者名を入力" />
-          </Form.Item>
-
-          {/* 担当セラピスト */}
-          <Form.Item
-            name="therapist"
-            label="担当セラピスト"
-            rules={[
-              { required: true, message: "担当セラピストを選択してください。" },
-            ]}
-          >
-            <Select placeholder="セラピストを選択">
-              <Option value="therapist1">セラピストA</Option>
-              <Option value="therapist2">セラピストB</Option>
-            </Select>
-          </Form.Item>
-
           {/* 予約日 */}
           <Form.Item
             name="date"
@@ -130,6 +107,11 @@ const ScheduleList: React.FC = () => {
                 </Option>
               ))}
             </Select>
+          </Form.Item>
+
+          {/* 備考 */}
+          <Form.Item name="remarks" label="備考" rules={[{ required: false }]}>
+            <Input placeholder="例：本日のリハビリ内容" />
           </Form.Item>
         </Form>
       </Modal>
