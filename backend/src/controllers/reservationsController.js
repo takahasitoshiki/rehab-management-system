@@ -16,19 +16,19 @@ exports.createReservation = async (req, res) => {
 };
 
 
-// 予約取得
-// exports.getAllReservation = async (req, res) => {
-//   try {
-//     const reservations = await Reservation.find(); //全予約を取得
-//     res
-//       .status(201)
-//       .json(reservations);
-//   } catch (error) {
-//     res
-//       .status(500)
-//       .json({ error: "予約の作成に失敗しました。" });
-//   }
-// };
+// 予約を全て取得する
+exports.getAllReservations = async (req, res) => {
+  try {
+    const reservations = await Reservation.find(); //全予約を取得
+    res
+      .status(201)
+      .json(reservations);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "予約の作成に失敗しました。" });
+  }
+};
 
 // 予約取得
 exports.getReservationById = async (req, res) => {

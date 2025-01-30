@@ -1,7 +1,7 @@
 const express = require('express');
 const {
     createReservation,
-    // getAllReservations,
+    getAllReservations,
     getReservationById,
     searchReservations,
     updateReservation,
@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/", createReservation);
 
 // 予約検索
-// router.get("/", getAllReservations);
+router.get("/", getAllReservations);
 
 // 予約ID検索
 router.get("/:id", getReservationById);
