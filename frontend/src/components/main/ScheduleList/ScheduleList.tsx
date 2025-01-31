@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { Table, Modal, Form, Input, Select, DatePicker } from "antd";
+import React, { useEffect, useState } from "react";
+import { Table, Modal, Form, Input, Select, DatePicker, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { scheduleColumns } from "../../../constants/scheduleColumns";
 import { generateTimeSlots } from "@/utils/timeSlotGenerator";
+import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
 import dayjs from "dayjs";
 
 const { Option } = Select;
@@ -14,12 +15,39 @@ type TimeSlot = {
   patient: string;
 };
 
+interface Therapist {
+  therapist_id: string;
+  username: string;
+}
+
 const ScheduleList: React.FC = () => {
+  const [therapist, setTherapist] = useState<Therapist[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
   // データソース
   const dataSource: TimeSlot[] = generateTimeSlots();
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const therapistData = await fetchTherapistList();
+        setTherapist(therapistData);
+      } catch (error) {
+        console.error(error);
+        message.error("ユーザー情報の取得に失敗しました。");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUsers();
+  }, []);
+
+  const therapistColumns = [
+    { title: "ID", dataIndex: "therapist_id", key: "therapist_id", width: 100 },
+    { title: "名前", dataIndex: "username", key: "username", width: 200 },
+  ];
 
   const generateTimeOptions = () => {
     const times: string[] = [];
@@ -54,6 +82,16 @@ const ScheduleList: React.FC = () => {
 
   return (
     <SectionWrapper>
+      <Table<Therapist>
+        className="custom-table"
+        columns={therapistColumns}
+        dataSource={therapist}
+        loading={loading}
+        pagination={false}
+        bordered
+        size="small"
+        style={{ tableLayout: "fixed", marginBottom: "20px" }}
+      />
       <Table<TimeSlot>
         className="custom-table"
         columns={scheduleColumns.map((column) => ({
