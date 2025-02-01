@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Table, Modal, Form, Input, Select, DatePicker, message } from "antd";
+import {
+  Table,
+  Modal,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  message,
+} from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { scheduleColumns } from "../../../constants/scheduleColumns";
 import { generateTimeSlots } from "@/utils/timeSlotGenerator";
@@ -21,7 +29,7 @@ interface Therapist {
 }
 
 const ScheduleList: React.FC = () => {
-  const [therapist, setTherapist] = useState<Therapist[]>([]);
+  const [therapists, setTherapists] = useState<Therapist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -30,24 +38,24 @@ const ScheduleList: React.FC = () => {
   const dataSource: TimeSlot[] = generateTimeSlots();
 
   useEffect(() => {
-    const loadUsers = async () => {
+    const loadTherapists = async () => {
       try {
         const therapistData = await fetchTherapistList();
-        setTherapist(therapistData);
+        console.log("取得したセラピストデータ:", therapistData);
+        if (!Array.isArray(therapistData)) {
+          throw new Error("取得したデータが配列ではありません！");
+        }
+        setTherapists(therapistData);
       } catch (error) {
-        console.error(error);
-        message.error("ユーザー情報の取得に失敗しました。");
+        console.error("エラー内容:", error);
+        message.error("セラピスト情報の取得に失敗しました。");
       } finally {
         setLoading(false);
       }
     };
-    loadUsers();
+    loadTherapists();
   }, []);
 
-  const therapistColumns = [
-    { title: "ID", dataIndex: "therapist_id", key: "therapist_id", width: 100 },
-    { title: "名前", dataIndex: "username", key: "username", width: 200 },
-  ];
 
   const generateTimeOptions = () => {
     const times: string[] = [];
@@ -63,14 +71,7 @@ const ScheduleList: React.FC = () => {
   };
 
   // ダブルクリック時にモーダルを開く
-  const handleRowDoubleClick = (record: TimeSlot, columnKey?: string) => {
-    console.log("クリックした行データ:", record);
-    console.log("クリックしたカラム:", columnKey);
-    console.log(
-      "クリックした時間:",
-      columnKey ? record[columnKey as keyof TimeSlot] : "カラムキーが未定義"
-    );
-
+  const handleRowDoubleClick = (record: TimeSlot) => {
     // フォームのデフォルト値を設定
     form.setFieldsValue({
       time: `${record.hour}:${record.minute}`, // クリックした行の時間データをセット
@@ -82,34 +83,31 @@ const ScheduleList: React.FC = () => {
 
   return (
     <SectionWrapper>
-      <Table<Therapist>
-        className="custom-table"
-        columns={therapistColumns}
-        dataSource={therapist}
-        loading={loading}
-        pagination={false}
-        bordered
-        size="small"
-        style={{ tableLayout: "fixed", marginBottom: "20px" }}
-      />
-      <Table<TimeSlot>
-        className="custom-table"
-        columns={scheduleColumns.map((column) => ({
-          ...column,
-          onCell: (record: TimeSlot) => ({
-            onDoubleClick: () =>
-              handleRowDoubleClick(
-                record,
-                column.dataIndex as string | undefined
-              ),
-          }),
-        }))}
-        dataSource={dataSource}
-        pagination={false}
-        bordered
-        size="small"
-        style={{ tableLayout: "fixed" }}
-      />
+      <div style={{ display: "flex", overflowX: "auto", whiteSpace: "nowrap" }}>
+      {therapists.map((therapist) => (
+          <div key={therapist.therapist_id}>
+            <Table<TimeSlot>
+              className="custom-table"
+              columns={scheduleColumns.map((column) => ({
+                ...column,
+                onCell: (record: TimeSlot) => ({
+                  onDoubleClick: () =>
+                    handleRowDoubleClick(
+                      record,
+                    ),
+                }),
+              }))}
+              title={() => `${therapist.username}`} 
+              dataSource={dataSource}
+              loading={loading}
+              pagination={false}
+              bordered
+              size="small"
+              style={{ tableLayout: "fixed" }}
+            />
+          </div>
+        ))}
+      </div>
 
       {/* 予約ダイアログ */}
       <Modal

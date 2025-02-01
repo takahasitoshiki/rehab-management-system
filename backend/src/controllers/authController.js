@@ -1,32 +1,53 @@
 const User = require("../models/userModel.js");
 const jwt = require("jsonwebtoken");
 
-
 // ユーザー登録
 exports.registerUser = async (req, res) => {
-  const { therapist_id, username, password } = req.body;
+  const { username, password } = req.body;
 
   try {
-    // 入力データのバリデーション
-    if (!therapist_id ||!username || !password) {
-      return res
-        .status(400)
-        .json({ message: "全てのフィールドを入力してください。" }); //不正リクエスト
+    // 🔹 最新の therapist_id を取得
+    const lastUser = await User.findOne({}, "therapist_id")
+      .sort({ therapist_id: -1 })
+      .lean();
+
+    // 🔹 therapist_id の処理
+    let newId = lastUser && lastUser.therapist_id
+      ? parseInt(lastUser.therapist_id.replace("PT", ""), 10) + 1
+      : 1;
+
+    if (Number.isNaN(newId)) {
+      console.warn("⚠ therapist_id の取得に失敗しました。デフォルトの 'PT001' を使用します。");
+      newId = 1;
     }
 
-    // ユーザーがすでに存在していないか確認
-    const existingUser = await User.findOne({ therapist_id });
+    const nextTherapistId = `PT${String(newId).padStart(3, "0")}`;
+
+    // 🔹 ユーザー名の重複チェック
+    const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res
-        .status(404)
-        .json({ message: "このユーザーはすでに登録済みです。" }); //ユーザーが登録済みの場合
+        .status(400)
+        .json({ message: "このユーザー名は既に登録されています。" });
     }
 
-    const newUser = new User({ therapist_id, username, password });
+    // 🔹 入力データのバリデーション
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ message: "全てのフィールドを入力してください。" });
+    }
+
+    // 🔹 ユーザー作成
+    const newUser = new User({
+      therapist_id: nextTherapistId,
+      username,
+      password,
+    });
     await newUser.save();
 
-    // ユーザー登録成功
     res.status(201).json({ message: "ユーザー登録に成功しました。" });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "サーバーエラーが発生しました。" });
@@ -71,28 +92,22 @@ exports.loginUser = async (req, res) => {
 
     res.status(200).json({ message: "ログイン成功しました。", token });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "サーバーエラーが発生しました。",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "サーバーエラーが発生しました。",
+      error: error.message,
+    });
   }
 };
 
 // ユーザー取得
-exports.getAllUser =async (req, res) => {
+exports.getAllUser = async (req, res) => {
   try {
-    const users = await User.find({},"therapist_id username" ); 
-    if (!users || users.length === 0){
-      return res.status(404).json({ error: "ユーザーが見つかりません"})
+    const users = await User.find({}, "therapist_id username");
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: "ユーザーが見つかりません" });
     }
-    res
-      .status(200)
-      .json(users);
+    res.status(200).json(users);
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "ユーザーの取得に失敗しました。" });
+    res.status(500).json({ error: "ユーザーの取得に失敗しました。" });
   }
 };

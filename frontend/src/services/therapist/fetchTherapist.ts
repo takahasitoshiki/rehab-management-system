@@ -11,9 +11,10 @@ export interface Therapist {
 export const fetchTherapistList = async () => {
     try{
         const response = await axios.get(`${VITE_API_THERAPIST_URL}/all`); // テンプレートリテラルを修正
-        return response.data.data || []; // 必要ならば .data を抽出
+        return response.data || []; 
     }catch(error){
         console.error("API呼び出し中にエラーが発生しました:", error);
         throw new Error("セラピスト情報の取得に失敗しました");
+        return []; // ✅ エラー時は空の配列を返す
     }
 }
