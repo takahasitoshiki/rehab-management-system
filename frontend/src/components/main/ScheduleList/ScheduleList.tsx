@@ -1,18 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  Modal,
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  message,
-} from "antd";
+import { Modal, Form, Input, Select, DatePicker, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
-import { scheduleColumns } from "../../../constants/scheduleColumns";
 import { generateTimeSlots } from "@/utils/timeSlotGenerator";
 import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
 import dayjs from "dayjs";
+import TherapistScheduleTable from "@/components/main/TherapistScheduleTable"; // ✅ 新しく分離したコンポーネントをインポート
 
 const { Option } = Select;
 
@@ -56,7 +48,6 @@ const ScheduleList: React.FC = () => {
     loadTherapists();
   }, []);
 
-
   const generateTimeOptions = () => {
     const times: string[] = [];
     for (let hour = 8; hour <= 17; hour++) {
@@ -83,31 +74,13 @@ const ScheduleList: React.FC = () => {
 
   return (
     <SectionWrapper>
-      <div style={{ display: "flex", overflowX: "auto", whiteSpace: "nowrap" }}>
-      {therapists.map((therapist) => (
-          <div key={therapist.therapist_id}>
-            <Table<TimeSlot>
-              className="custom-table"
-              columns={scheduleColumns.map((column) => ({
-                ...column,
-                onCell: (record: TimeSlot) => ({
-                  onDoubleClick: () =>
-                    handleRowDoubleClick(
-                      record,
-                    ),
-                }),
-              }))}
-              title={() => `${therapist.username}`} 
-              dataSource={dataSource}
-              loading={loading}
-              pagination={false}
-              bordered
-              size="small"
-              style={{ tableLayout: "fixed" }}
-            />
-          </div>
-        ))}
-      </div>
+      {/* ✅ TherapistScheduleTable コンポーネントを利用 */}
+      <TherapistScheduleTable
+        therapists={therapists}
+        dataSource={dataSource}
+        loading={loading}
+        handleRowDoubleClick={handleRowDoubleClick}
+      />
 
       {/* 予約ダイアログ */}
       <Modal

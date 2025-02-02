@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { message, Table, Spin } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { fetchPatientsList } from "@/services/patients/fetchPatients";
+import { useDrag } from "react-dnd";
 
 interface Patient {
   _id: string;
@@ -22,20 +23,46 @@ const PatientList: React.FC = () => {
 
   useEffect(() => {
     const loadPatients = async () => {
-      setLoading(true); //ローディング開始
       try {
+        setLoading(true);
         const data = await fetchPatientsList();
+        if (!Array.isArray(data)) throw new Error("データが配列ではありません");
         setPatients(data);
-        console.log("データ:"+data)
       } catch (error) {
-        console.error("エラー詳細:" + error);
+        console.error("エラー:", error);
         message.error("患者情報の取得に失敗しました。");
       } finally {
         setLoading(false);
       }
     };
     loadPatients();
-  },[]);
+  }, []);
+
+  // ✅ ドラッグ可能な行コンポーネント
+  const DraggableRow: React.FC<{ record: Patient; index: number }> = ({
+    record,
+    index,
+    ...props
+  }) => {
+    const [{ isDragging }, drag] = useDrag({
+      type: "PATIENT",
+      item: { patient: record }, // ドラッグするデータ
+      collect: (monitor) => ({
+        isDragging: !!monitor.isDragging(),
+      }),
+    });
+
+    return (
+      <tr
+        {...props}
+        ref={drag}
+        style={{
+          opacity: isDragging ? 0.5 : 1,
+          cursor: "move",
+        }}
+      />
+    );
+  };
 
   return (
     <SectionWrapper>
@@ -46,9 +73,14 @@ const PatientList: React.FC = () => {
       ) : (
         <Table
           columns={columns}
-          dataSource={Array.isArray(patients) ? patients : []} // 配列かどうか確認
+          dataSource={patients}
           rowKey="_id"
           pagination={false}
+          components={{
+            body: {
+              row: DraggableRow, // 各行をドラッグ可能にする
+            },
+          }}
         />
       )}
     </SectionWrapper>
