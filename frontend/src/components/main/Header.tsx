@@ -38,10 +38,12 @@ interface CustomHeaderProps {
       achievements: boolean;
     }>
   >;
+  onDateChange: (dates: [Dayjs, Dayjs]) => void;
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({
   setVisibleSections,
+  onDateChange,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
@@ -116,11 +118,16 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   };
 
   const { RangePicker } = DatePicker;
-  const handleDateChange = (
-    dates: [Dayjs | null, Dayjs | null] | null,
-    dateStrings: [string, string]
-  ) => {
-    console.log("選択された期間:", dates, dateStrings);
+
+  const handleDateChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
+    if (dates && dates[0] && dates[1]) {
+      console.log(
+        "選択された期間:",
+        dates[0].format("YYYY-MM-DD"),
+        dates[1].format("YYYY-MM-DD")
+      );
+      onDateChange([dates[0], dates[1]]);
+    }
   };
 
   return (

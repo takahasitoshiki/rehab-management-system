@@ -1,6 +1,9 @@
-import React from "react";
-import { Table } from "antd";
+import React, { useState, useEffect } from "react";
+import { Table, message } from "antd";
 import { scheduleColumns } from "@/constants/scheduleColumns";
+import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
+import dayjs,{ Dayjs } from "dayjs";
+
 
 type TimeSlot = {
   key: string;
@@ -9,19 +12,56 @@ type TimeSlot = {
   patient: string;
 };
 
+interface Therapist {
+  therapist_id: string;
+  username: string;
+}
+
+
 interface TherapistScheduleTableProps {
-  therapists: { therapist_id: string; username: string }[];
+  therapists: Therapist[];
   dataSource: TimeSlot[];
   loading: boolean;
   handleRowDoubleClick: (record: TimeSlot) => void;
+  selectedDates: [Dayjs, Dayjs] | null; // ✅ 追加
 }
 
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
-  therapists,
   dataSource,
-  loading,
   handleRowDoubleClick,
+
 }) => {
+  const [therapists, setTherapists] = useState<Therapist[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const loadTherapists = async () => {
+      try {
+        const therapistData = await fetchTherapistList();
+        console.log("取得したセラピストデータ:", therapistData);
+        if (!Array.isArray(therapistData)) {
+          throw new Error("取得したデータが配列ではありません！");
+        }
+        setTherapists(therapistData);
+      } catch (error) {
+        console.error("エラー内容:", error);
+        message.error("セラピスト情報の取得に失敗しました。");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTherapists();
+  }, []);
+
+    // ✅ 選択された期間でフィルタリングする処理（必要なら）
+    const filteredDataSource = selectedDates
+    ? dataSource.filter((slot) =>
+        dayjs().isBetween(selectedDates[0], selectedDates[1], "day", "[]")
+      )
+    : dataSource;
+
+
+
   return (
     <div
       style={{
@@ -45,7 +85,7 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
               }),
             }))}
             title={() => `${therapist.username}`}
-            dataSource={dataSource}
+            dataSource={filteredDataSource} // ✅ フィルタリングしたデータを渡す
             loading={loading}
             pagination={false}
             bordered

@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Select, DatePicker, message } from "antd";
+import React, { useState } from "react";
+import { Modal, Form, Input, Select, DatePicker } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots } from "@/utils/timeSlotGenerator";
-import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
 import dayjs from "dayjs";
-import TherapistScheduleTable from "@/components/main/TherapistScheduleTable"; // ✅ 新しく分離したコンポーネントをインポート
+import TherapistScheduleTable from "@/components/main/TherapistScheduleTable"; 
 
 const { Option } = Select;
 
@@ -15,38 +14,13 @@ type TimeSlot = {
   patient: string;
 };
 
-interface Therapist {
-  therapist_id: string;
-  username: string;
-}
 
 const ScheduleList: React.FC = () => {
-  const [therapists, setTherapists] = useState<Therapist[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
   // データソース
   const dataSource: TimeSlot[] = generateTimeSlots();
-
-  useEffect(() => {
-    const loadTherapists = async () => {
-      try {
-        const therapistData = await fetchTherapistList();
-        console.log("取得したセラピストデータ:", therapistData);
-        if (!Array.isArray(therapistData)) {
-          throw new Error("取得したデータが配列ではありません！");
-        }
-        setTherapists(therapistData);
-      } catch (error) {
-        console.error("エラー内容:", error);
-        message.error("セラピスト情報の取得に失敗しました。");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadTherapists();
-  }, []);
 
   const generateTimeOptions = () => {
     const times: string[] = [];
@@ -76,9 +50,7 @@ const ScheduleList: React.FC = () => {
     <SectionWrapper>
       {/* ✅ TherapistScheduleTable コンポーネントを利用 */}
       <TherapistScheduleTable
-        therapists={therapists}
         dataSource={dataSource}
-        loading={loading}
         handleRowDoubleClick={handleRowDoubleClick}
       />
 

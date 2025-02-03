@@ -41,7 +41,6 @@ const PatientList: React.FC = () => {
   // ✅ ドラッグ可能な行コンポーネント
   const DraggableRow: React.FC<{ record: Patient; index: number }> = ({
     record,
-    index,
     ...props
   }) => {
     const [{ isDragging }, drag] = useDrag({
