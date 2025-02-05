@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Modal, Form, Input, Select, DatePicker } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots } from "@/utils/timeSlotGenerator";
-import dayjs from "dayjs";
-import TherapistScheduleTable from "@/components/main/TherapistScheduleTable"; 
+import dayjs, { Dayjs } from "dayjs";
+import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
 
 const { Option } = Select;
 
@@ -14,8 +14,11 @@ type TimeSlot = {
   patient: string;
 };
 
+interface ScheduleListProps {
+  selectedDates: [Dayjs, Dayjs] ; // ✅ 受け取る
+}
 
-const ScheduleList: React.FC = () => {
+const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
@@ -35,6 +38,7 @@ const ScheduleList: React.FC = () => {
     return times;
   };
 
+
   // ダブルクリック時にモーダルを開く
   const handleRowDoubleClick = (record: TimeSlot) => {
     // フォームのデフォルト値を設定
@@ -52,6 +56,7 @@ const ScheduleList: React.FC = () => {
       <TherapistScheduleTable
         dataSource={dataSource}
         handleRowDoubleClick={handleRowDoubleClick}
+        selectedDates={selectedDates}
       />
 
       {/* 予約ダイアログ */}

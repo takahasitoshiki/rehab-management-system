@@ -43,7 +43,7 @@ exports.getReservationById = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ error: "予約の取得に失敗しました。" });
+      .json({ error: "予約の取得に失敗しました。zzz" });
   }
 };
 
@@ -84,7 +84,7 @@ exports.searchReservations = async (req, res) => {
     const query = {};
 
     if (date) query.date = date;
-    if (patient_id) query.patients_code = patient_id;
+    if (patients_code) query.patients_code = patients_code;
     if (therapist_id) query.therapist_id = therapist_id;
 
     const reservations = await Reservation.find(query);

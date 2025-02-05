@@ -102,7 +102,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
       return;
     }
     // セクションキーがない場合はモーダルを表示
-    console.log("セクションキーがありません。モーダルを表示します。");
     if (content) {
       setModalContent(content);
       setIsModalVisible(true);
@@ -121,11 +120,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 
   const handleDateChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
     if (dates && dates[0] && dates[1]) {
-      console.log(
-        "選択された期間:",
-        dates[0].format("YYYY-MM-DD"),
-        dates[1].format("YYYY-MM-DD")
-      );
       onDateChange([dates[0], dates[1]]);
     }
   };

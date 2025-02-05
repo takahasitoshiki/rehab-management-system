@@ -16,11 +16,12 @@ router.post("/", createReservation);
 // 予約検索
 router.get("/", getAllReservations);
 
+// 予約条件検索
+router.get("/search", searchReservations);
+
 // 予約ID検索
 router.get("/:id", getReservationById);
 
-// 予約条件検索
-router.get("/search", searchReservations);
 
 // 予約更新
 router.put("/:id", updateReservation);

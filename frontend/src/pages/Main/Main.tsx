@@ -19,11 +19,10 @@ const Scheduling: React.FC = () => {
   >(null);
   
   // 🔹 期間を管理する State
-  const [selectedDates, setSelectedDates] = useState<[Dayjs, Dayjs] | null>([
-    dayjs().startOf("week"),
-    dayjs().endOf("week"),
+  const [selectedDates, setSelectedDates] = useState<[Dayjs, Dayjs]>([
+    dayjs().startOf("day"),
+    dayjs().endOf("day"),
   ]);
-
   return (
     <Layout style={{ height: "100vh" }}>
       {/* ヘッダー */}

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Table, message } from "antd";
 import { scheduleColumns } from "@/constants/scheduleColumns";
 import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
-import dayjs,{ Dayjs } from "dayjs";
-
+import dayjs, { Dayjs } from "dayjs";
+import isBetween from "dayjs/plugin/isBetween"; // ✅ isBetween プラグインをインポート
+dayjs.extend(isBetween);
 
 type TimeSlot = {
   key: string;
@@ -17,28 +18,24 @@ interface Therapist {
   username: string;
 }
 
-
 interface TherapistScheduleTableProps {
-  therapists: Therapist[];
   dataSource: TimeSlot[];
-  loading: boolean;
   handleRowDoubleClick: (record: TimeSlot) => void;
-  selectedDates: [Dayjs, Dayjs] | null; // ✅ 追加
+  selectedDates: [Dayjs, Dayjs];
 }
 
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   dataSource,
   handleRowDoubleClick,
-
+  selectedDates,
 }) => {
   const [therapists, setTherapists] = useState<Therapist[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(!therapists.length);
 
   useEffect(() => {
     const loadTherapists = async () => {
       try {
         const therapistData = await fetchTherapistList();
-        console.log("取得したセラピストデータ:", therapistData);
         if (!Array.isArray(therapistData)) {
           throw new Error("取得したデータが配列ではありません！");
         }
@@ -53,15 +50,16 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     loadTherapists();
   }, []);
 
-    // ✅ 選択された期間でフィルタリングする処理（必要なら）
-    const filteredDataSource = selectedDates
-    ? dataSource.filter((slot) =>
-        dayjs().isBetween(selectedDates[0], selectedDates[1], "day", "[]")
-      )
-    : dataSource;
+  // ✅ `onCell` の修正: 既存の `onCell` を保持
+  const modifiedColumns = scheduleColumns.map((column) => ({
+    ...column,
+    onCell: (record: TimeSlot) => ({
+      ...(column.onCell ? column.onCell(record) : {}),
+      onDoubleClick: () => handleRowDoubleClick(record),
+    }),
+  }));
 
-
-
+  console.log(selectedDates);
   return (
     <div
       style={{
@@ -72,20 +70,12 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       }}
     >
       {therapists.map((therapist) => (
-        <div
-          key={therapist.therapist_id}
-          style={{ flexShrink: 0}}
-        >
+        <div key={therapist.therapist_id} style={{ flexShrink: 0 }}>
           <Table<TimeSlot>
             className="custom-table"
-            columns={scheduleColumns.map((column) => ({
-              ...column,
-              onCell: (record: TimeSlot) => ({
-                onDoubleClick: () => handleRowDoubleClick(record),
-              }),
-            }))}
+            columns={modifiedColumns}
             title={() => `${therapist.username}`}
-            dataSource={filteredDataSource} // ✅ フィルタリングしたデータを渡す
+            dataSource={dataSource}
             loading={loading}
             pagination={false}
             bordered

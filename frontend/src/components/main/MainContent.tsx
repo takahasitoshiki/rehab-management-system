@@ -3,6 +3,8 @@ import MainHeader from "./MainHeader";
 import PatientList from "./PatientList/PatientList";
 import ScheduleList from "./ScheduleList/ScheduleList";
 import AchievementList from "./AchievementList/AchievementList";
+import { Dayjs } from "dayjs";
+
 
 interface MainContentProps {
   visibleSections: {
@@ -21,12 +23,15 @@ interface MainContentProps {
   setMaximizedSection: React.Dispatch<
     React.SetStateAction<"patients" | "schedules" | "achievements" | null>
   >;
+  selectedDates: [Dayjs, Dayjs]; // ✅ 受け取る
 }
 
 const MainContent: React.FC<MainContentProps> = ({
   visibleSections,
+  // maximizedSection,
   setVisibleSections,
   setMaximizedSection,
+  selectedDates,
 }) => {
   const baseSectionStyle: React.CSSProperties = {
     flex: 1,
@@ -84,7 +89,7 @@ const MainContent: React.FC<MainContentProps> = ({
             onClose={() => handleClose("schedules")}
             onMaximize={() => handleMaximize("schedules")}
           />
-          <ScheduleList />
+          <ScheduleList selectedDates={selectedDates}/>
         </div>
       )}
 
