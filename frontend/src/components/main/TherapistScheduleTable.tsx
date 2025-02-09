@@ -58,8 +58,7 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       onDoubleClick: () => handleRowDoubleClick(record),
     }),
   }));
-
-  console.log(selectedDates);
+  console.log("取得した選択日付"+selectedDates);
   return (
     <div
       style={{
@@ -69,23 +68,25 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
         maxWidth: "120vw",
       }}
     >
-      {therapists.map((therapist) => (
-        <div key={therapist.therapist_id} style={{ flexShrink: 0 }}>
-          <Table<TimeSlot>
-            className="custom-table"
-            columns={modifiedColumns}
-            title={() => `${therapist.username}`}
-            dataSource={dataSource}
-            loading={loading}
-            pagination={false}
-            bordered
-            size="small"
-            style={{ tableLayout: "fixed" }}
-          />
-        </div>
-      ))}
+    {(selectedDates || []).map((date) =>
+        therapists.map((therapist) => (
+          <div key={`${therapist.therapist_id}-${date.format("YYYY-MM-DD")}`} style={{ flexShrink: 0 }}>
+            <Table<TimeSlot>
+              className="custom-table"
+              columns={modifiedColumns}
+              title={() => `${therapist.username} (${date.format("YYYY-MM-DD")})`}
+              dataSource={dataSource}
+              loading={loading}
+              pagination={false}
+              bordered
+              size="small"
+              style={{ tableLayout: "fixed" }}
+            />
+          </div>
+        ))
+      )}
     </div>
   );
-};
+ };
 
 export default TherapistScheduleTable;
