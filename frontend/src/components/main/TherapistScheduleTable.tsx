@@ -63,28 +63,49 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     <div
       style={{
         display: "flex",
+        flexWrap: "nowrap",
         overflowX: "auto",
         whiteSpace: "nowrap",
-        maxWidth: "120vw",
+        width: "100%",
       }}
     >
-    {(selectedDates || []).map((date) =>
-        therapists.map((therapist) => (
-          <div key={`${therapist.therapist_id}-${date.format("YYYY-MM-DD")}`} style={{ flexShrink: 0 }}>
-            <Table<TimeSlot>
-              className="custom-table"
-              columns={modifiedColumns}
-              title={() => `${therapist.username} (${date.format("YYYY-MM-DD")})`}
-              dataSource={dataSource}
-              loading={loading}
-              pagination={false}
-              bordered
-              size="small"
-              style={{ tableLayout: "fixed" }}
-            />
-          </div>
-        ))
-      )}
+      {(() => {
+        if (!selectedDates || !Array.isArray(selectedDates) || selectedDates.length !== 2) {
+          console.error("Error: selectedDates is not a valid date range", selectedDates);
+          return <p>日付が正しく選択されていません。</p>;
+        }
+  
+        const [startDate, endDate] = selectedDates;
+        const dateList = [];
+        for (let date = startDate; date.isBefore(endDate) || date.isSame(endDate, 'day'); date = date.add(1, 'day')) {
+          dateList.push(date);
+        }
+  
+        return dateList.map((date) =>
+          therapists.map((therapist) => (
+            <div
+              key={`${therapist.therapist_id}-${date.format("YYYY-MM-DD")}`}
+              style={{
+                flexShrink: 0,
+                minWidth: "250px",
+                display: "inline-block",
+              }}
+            >
+              <Table<TimeSlot>
+                className="custom-table"
+                columns={modifiedColumns}
+                title={() => `${therapist.username} (${date.format("YYYY-MM-DD")})`}
+                dataSource={dataSource}
+                loading={loading}
+                pagination={false}
+                bordered
+                size="small"
+                style={{ tableLayout: "fixed", minWidth: "250px" }}
+              />
+            </div>
+          ))
+        );
+      })()}
     </div>
   );
  };

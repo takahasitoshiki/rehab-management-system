@@ -83,7 +83,7 @@ const MainContent: React.FC<MainContentProps> = ({
 
       {/* 予約一覧 */}
       {visibleSections.schedules && (
-        <div style={{ ...getSectionStyle("schedules"), flex: 4 }}>
+      <div style={{ ...getSectionStyle("schedules"), flex: 4, overflowX: "auto", minWidth: "500px" }}>
           <MainHeader
             title="予約一覧"
             onClose={() => handleClose("schedules")}

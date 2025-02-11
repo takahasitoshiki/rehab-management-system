@@ -6,7 +6,9 @@ const sectionStyle: React.CSSProperties = {
   borderRadius: "5px",
   backgroundColor: "#fff", 
   height: "95%", 
-  overflow: "auto"
+  overflow: "auto",
+  maxWidth: "120vw",
+
 };
 
 
