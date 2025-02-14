@@ -95,13 +95,13 @@ const MainContent: React.FC<MainContentProps> = ({
 
       {/* 実績一覧 */}
       {visibleSections.achievements && (
-        <div style={{ ...getSectionStyle("achievements"), flex: 4 }}>
+        <div style={{ ...getSectionStyle("achievements"), flex: 4,overflowX: "auto", minWidth: "500px" }}>
           <MainHeader
             title="実績一覧"
             onClose={() => handleClose("achievements")}
             onMaximize={() => handleMaximize("achievements")}
           />
-          <AchievementList />
+          <AchievementList selectedDates={selectedDates} />
         </div>
       )}
     </div>

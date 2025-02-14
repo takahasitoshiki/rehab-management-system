@@ -1,9 +1,18 @@
-import React, { useState } from "react";
-import { Modal, Form, Input, Select, DatePicker } from "antd";
+import React, { useState,useEffect } from "react";
+import { Modal, Form, Input, Select, DatePicker, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots } from "@/utils/timeSlotGenerator";
 import dayjs, { Dayjs } from "dayjs";
 import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
+import { fetchPatientsList } from "@/services/patients/fetchPatients";
+
+
+interface Patient {
+  _id: string;
+  patients_code: string;
+  patients_name: string;
+  classification: string;
+}
 
 const { Option } = Select;
 
@@ -15,12 +24,31 @@ type TimeSlot = {
 };
 
 interface ScheduleListProps {
-  selectedDates: [Dayjs, Dayjs] ; // ✅ 受け取る
+  selectedDates: [Dayjs, Dayjs]; // ✅ 受け取る
 }
 
 const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadPatients = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchPatientsList();
+        if (!Array.isArray(data)) throw new Error("データが配列ではありません");
+        setPatients(data);
+      } catch (error) {
+        console.error("エラー:", error);
+        message.error("患者情報の取得に失敗しました。");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPatients();
+  }, []);
 
   // データソース
   const dataSource: TimeSlot[] = generateTimeSlots();
@@ -37,7 +65,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     }
     return times;
   };
-
 
   // ダブルクリック時にモーダルを開く
   const handleRowDoubleClick = (record: TimeSlot) => {
@@ -69,6 +96,21 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         cancelText="キャンセル"
       >
         <Form form={form} layout="vertical">
+          {/* 患者名 */}
+          <Form.Item
+            name="patientName"
+            label="患者名"
+            rules={[{ required: true, message: "患者名を入力してください" }]}
+          >
+            <Select placeholder="患者名" loading={loading}>
+              {patients.map((patient) => (
+                <Option key={patient._id} value={patient.patients_name}>
+                  {patient.patients_name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
           {/* 予約日 */}
           <Form.Item
             name="date"

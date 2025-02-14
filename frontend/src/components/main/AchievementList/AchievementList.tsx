@@ -1,10 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Modal, Form, Input, Select, DatePicker, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots } from "@/utils/timeSlotGenerator";
-import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
-import dayjs from "dayjs";
-import TherapistScheduleTable from "@/components/main/TherapistScheduleTable"; 
+import dayjs, { Dayjs } from "dayjs";
+import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
+import { fetchPatientsList } from "@/services/patients/fetchPatients";
+
+interface Patient {
+  _id: string;
+  patients_code: string;
+  patients_name: string;
+  classification: string;
+}
 
 const { Option } = Select;
 
@@ -15,38 +22,35 @@ type TimeSlot = {
   patient: string;
 };
 
-interface Therapist {
-  therapist_id: string;
-  username: string;
+interface ScheduleListProps {
+  selectedDates: [Dayjs, Dayjs]; // ✅ 受け取る
 }
 
-const AchievementList: React.FC = () => {
-  const [therapists, setTherapists] = useState<Therapist[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-
-  // データソース
-  const dataSource: TimeSlot[] = generateTimeSlots();
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const loadTherapists = async () => {
+    const loadPatients = async () => {
       try {
-        const therapistData = await fetchTherapistList();
-        console.log("取得したセラピストデータ:", therapistData);
-        if (!Array.isArray(therapistData)) {
-          throw new Error("取得したデータが配列ではありません！");
-        }
-        setTherapists(therapistData);
+        setLoading(true);
+        const data = await fetchPatientsList();
+        if (!Array.isArray(data)) throw new Error("データが配列ではありません");
+        setPatients(data);
       } catch (error) {
-        console.error("エラー内容:", error);
-        message.error("セラピスト情報の取得に失敗しました。");
+        console.error("エラー:", error);
+        message.error("患者情報の取得に失敗しました。");
       } finally {
         setLoading(false);
       }
     };
-    loadTherapists();
+    loadPatients();
   }, []);
+
+  // データソース
+  const dataSource: TimeSlot[] = generateTimeSlots();
 
   const generateTimeOptions = () => {
     const times: string[] = [];
@@ -76,10 +80,9 @@ const AchievementList: React.FC = () => {
     <SectionWrapper>
       {/* ✅ TherapistScheduleTable コンポーネントを利用 */}
       <TherapistScheduleTable
-        therapists={therapists}
         dataSource={dataSource}
-        loading={loading}
         handleRowDoubleClick={handleRowDoubleClick}
+        selectedDates={selectedDates}
       />
 
       {/* 予約ダイアログ */}
@@ -92,6 +95,21 @@ const AchievementList: React.FC = () => {
         cancelText="キャンセル"
       >
         <Form form={form} layout="vertical">
+          {/* 患者名 */}
+          <Form.Item
+            name="patientName"
+            label="患者名"
+            rules={[{ required: true, message: "患者名を入力してください" }]}
+          >
+            <Select placeholder="患者名" loading={loading}>
+              {patients.map((patient) => (
+                <Option key={patient._id} value={patient.patients_name}>
+                  {patient.patients_name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
           {/* 予約日 */}
           <Form.Item
             name="date"

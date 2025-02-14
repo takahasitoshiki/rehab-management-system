@@ -3,7 +3,7 @@ import { Table, message } from "antd";
 import { scheduleColumns } from "@/constants/scheduleColumns";
 import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
 import dayjs, { Dayjs } from "dayjs";
-import isBetween from "dayjs/plugin/isBetween"; // ✅ isBetween プラグインをインポート
+import isBetween from "dayjs/plugin/isBetween";
 dayjs.extend(isBetween);
 
 type TimeSlot = {
@@ -21,7 +21,7 @@ interface Therapist {
 interface TherapistScheduleTableProps {
   dataSource: TimeSlot[];
   handleRowDoubleClick: (record: TimeSlot) => void;
-  selectedDates: [Dayjs, Dayjs];
+  selectedDates: [Dayjs, Dayjs] | null;
 }
 
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
@@ -53,12 +53,12 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   // ✅ `onCell` の修正: 既存の `onCell` を保持
   const modifiedColumns = scheduleColumns.map((column) => ({
     ...column,
-    onCell: (record: TimeSlot) => ({
-      ...(column.onCell ? column.onCell(record) : {}),
+    onCell: (record: TimeSlot, index?: number) => ({
+      ...(column.onCell ? column.onCell(record, index ?? 0) : {}), // ✅ `index` を追加
       onDoubleClick: () => handleRowDoubleClick(record),
     }),
   }));
-  console.log("取得した選択日付"+selectedDates);
+
   return (
     <div
       style={{
@@ -70,17 +70,33 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       }}
     >
       {(() => {
-        if (!selectedDates || !Array.isArray(selectedDates) || selectedDates.length !== 2) {
-          console.error("Error: selectedDates is not a valid date range", selectedDates);
+        if (
+          !selectedDates ||
+          !Array.isArray(selectedDates) ||
+          selectedDates.length !== 2
+        ) {
           return <p>日付が正しく選択されていません。</p>;
         }
-  
+
         const [startDate, endDate] = selectedDates;
+
+        // ✅ `Dayjs` オブジェクトかチェック
+        if (!dayjs.isDayjs(startDate) || !dayjs.isDayjs(endDate)) {
+          console.error(
+            "Error: selectedDates contains invalid Dayjs objects",
+            selectedDates
+          );
+          return <p>日付が正しく選択されていません。</p>;
+        }
         const dateList = [];
-        for (let date = startDate; date.isBefore(endDate) || date.isSame(endDate, 'day'); date = date.add(1, 'day')) {
+        for (
+          let date = startDate;
+          date.isBefore(endDate) || date.isSame(endDate, "day");
+          date = date.add(1, "day")
+        ) {
           dateList.push(date);
         }
-  
+
         return dateList.map((date) =>
           therapists.map((therapist) => (
             <div
@@ -94,7 +110,9 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
               <Table<TimeSlot>
                 className="custom-table"
                 columns={modifiedColumns}
-                title={() => `${therapist.username} (${date.format("YYYY-MM-DD")})`}
+                title={() =>
+                  `${therapist.username} (${date.format("YYYY-MM-DD")})`
+                }
                 dataSource={dataSource}
                 loading={loading}
                 pagination={false}
@@ -108,6 +126,6 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       })()}
     </div>
   );
- };
+};
 
 export default TherapistScheduleTable;
