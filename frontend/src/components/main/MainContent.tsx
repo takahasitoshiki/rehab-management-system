@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import MainHeader from "./MainHeader";
 import PatientList from "./PatientList/PatientList";
 import ScheduleList from "./ScheduleList/ScheduleList";
 import AchievementList from "./AchievementList/AchievementList";
 import { Dayjs } from "dayjs";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
+type TimeSlot = {
+  key: string;
+  hour: string;
+  minute: string;
+  patient: string;
+};
 
 interface MainContentProps {
   visibleSections: {
@@ -23,22 +31,23 @@ interface MainContentProps {
   setMaximizedSection: React.Dispatch<
     React.SetStateAction<"patients" | "schedules" | "achievements" | null>
   >;
-  selectedDates: [Dayjs, Dayjs]; // ✅ 受け取る
+  selectedDates: [Dayjs, Dayjs];
 }
 
 const MainContent: React.FC<MainContentProps> = ({
   visibleSections,
-  // maximizedSection,
   setVisibleSections,
   setMaximizedSection,
   selectedDates,
 }) => {
+  const [dataSource, setDataSource] = useState<TimeSlot[]>([]);
+
   const baseSectionStyle: React.CSSProperties = {
     flex: 1,
     border: "1px solid #ccc",
     borderRadius: "5px",
     padding: "3px",
-    transition: "flex 0.3s ease, width 0.3s ease, opacity 0.3s ease", // トランジションを設定
+    transition: "flex 0.3s ease, width 0.3s ease, opacity 0.3s ease",
   };
 
   const handleClose = (section: "patients" | "schedules" | "achievements") => {
@@ -48,9 +57,7 @@ const MainContent: React.FC<MainContentProps> = ({
   const handleMaximize = (
     section: "patients" | "schedules" | "achievements"
   ) => {
-    setMaximizedSection(section); // 最大化するセクションを設定
-
-    // 他のセクションを非表示にし、対象セクションを最大化
+    setMaximizedSection(section);
     setVisibleSections({
       patients: section === "patients",
       schedules: section === "schedules",
@@ -60,51 +67,45 @@ const MainContent: React.FC<MainContentProps> = ({
 
   const getSectionStyle = (
     section: "patients" | "schedules" | "achievements"
-  ) => {
-    return {
-      ...baseSectionStyle,
-      flex: visibleSections[section] ? 1 : 0, // 表示状態に応じてサイズを変更
-      transition: "flex 0.3s ease", // スムーズな遷移を適用
-    };
+  ) => ({
+    ...baseSectionStyle,
+    flex: visibleSections[section] ? 1 : 0,
+    transition: "flex 0.3s ease",
+  });
+
+  const onDropPatient = (timeSlotKey: string, patientName: string) => {
+    setDataSource((prevData) =>
+      prevData.map((slot) =>
+        slot.key === timeSlotKey ? { ...slot, patient: patientName } : slot
+      )
+    );
   };
 
   return (
-    <div style={{ display: "flex", width: "100%" }}>
-      {/* 患者一覧 */}
-      {visibleSections.patients && (
-        <div style={{ ...getSectionStyle("patients"), flex: 2 }}>
-          <MainHeader
-            title="患者一覧"
-            onClose={() => handleClose("patients")}
-          />
-          <PatientList />
-        </div>
-      )}
+    <DndProvider backend={HTML5Backend}>
+      <div style={{ display: "flex", width: "100%" }}>
+        {visibleSections.patients && (
+          <div style={{ ...getSectionStyle("patients"), flex: 2 }}>
+            <MainHeader title="患者一覧" onClose={() => handleClose("patients")} />
+            <PatientList />
+          </div>
+        )}
 
-      {/* 予約一覧 */}
-      {visibleSections.schedules && (
-      <div style={{ ...getSectionStyle("schedules"), flex: 4, overflowX: "auto", minWidth: "500px" }}>
-          <MainHeader
-            title="予約一覧"
-            onClose={() => handleClose("schedules")}
-            onMaximize={() => handleMaximize("schedules")}
-          />
-          <ScheduleList selectedDates={selectedDates}/>
-        </div>
-      )}
+        {visibleSections.schedules && (
+          <div style={{ ...getSectionStyle("schedules"), flex: 4, overflowX: "hidden", minWidth: "500px" }}>
+            <MainHeader title="予約一覧" onClose={() => handleClose("schedules")} onMaximize={() => handleMaximize("schedules")} />
+            <ScheduleList selectedDates={selectedDates} onDropPatient={onDropPatient} dataSource={dataSource} setDataSource={setDataSource} />
+          </div>
+        )}
 
-      {/* 実績一覧 */}
-      {visibleSections.achievements && (
-        <div style={{ ...getSectionStyle("achievements"), flex: 4,overflowX: "auto", minWidth: "500px" }}>
-          <MainHeader
-            title="実績一覧"
-            onClose={() => handleClose("achievements")}
-            onMaximize={() => handleMaximize("achievements")}
-          />
-          <AchievementList selectedDates={selectedDates} />
-        </div>
-      )}
-    </div>
+        {visibleSections.achievements && (
+          <div style={{ ...getSectionStyle("achievements"), flex: 4, overflowX: "hidden", minWidth: "500px" }}>
+            <MainHeader title="実績一覧" onClose={() => handleClose("achievements")} onMaximize={() => handleMaximize("achievements")} />
+            <AchievementList selectedDates={selectedDates} />
+          </div>
+        )}
+      </div>
+    </DndProvider>
   );
 };
 

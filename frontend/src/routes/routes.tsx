@@ -4,26 +4,27 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Login from "../pages/Login/Login";
-import Scheduling from "../pages/Main/Main";
-// import PrivateRoute from "../components/PrivateRoute";
+import Login from "@/pages/Login/Login";
+import Scheduling from "@/pages/Main/Main";
+import ProtectedRoute from "@/routes/ProtectedRoute"
 
 const AppRoutes: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* {デフォルトページのルートをログインページにリダイレクト} */}
+        {/* ✅ デフォルトページを /login にリダイレクト */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* ログインルート */}
-        <Route 
-        // element={<PrivateRoute />}
-        >
-          <Route path="/login" element={<Login />} />
+        {/* ✅ ログインルート (認証不要) */}
+        <Route path="/login" element={<Login />} />
+
+        {/* ✅ 認証が必要なページは ProtectedRoute 内に定義 */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/scheduling" element={<Scheduling />} />
         </Route>
 
-        {/* スケジューリングルート */}
-        <Route path="/scheduling" element={<Scheduling />} />
+        {/* ✅ 存在しないページは /login にリダイレクト */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

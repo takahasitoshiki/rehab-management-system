@@ -1,25 +1,27 @@
 import React from "react";
-import LoginIcon from "@/assets/icon/Login.png";
-import { Form, Input, Button } from "antd";
-import { login } from "../../services/auth";
 import "./Login.css";
+import LoginIcon from "@/assets/icon/Login.png";
+import { Form, Input, Button, message } from "antd";
+import { login } from "../../services/auth";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/useAuth"; // ✅ useAuth を追加
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const onFinish = async (values: {username: string; password: string}) => {
-    try{
-      const data = await login(values.username, values.password);
-      localStorage.setItem("token", data.token) //トークン保存
-      console.log("Login successful:", data);
-      navigate("/scheduling"); // ページ遷移
-    } catch (error: any ){
-      console.error("Login failed:", error.response?.data || error.message)
-    }
-    };
+  const { login: setAuth } = useAuth(); // ✅ 認証状態を更新する
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
+  const onFinish = async (values: { username: string; password: string }) => {
+    try {
+      const data = await login(values.username, values.password);
+      console.log("Received token:", data.token); // ✅ APIのレスポンスを確認
+      localStorage.setItem("token", data.token);
+      setAuth();
+      console.log("Stored token:", localStorage.getItem("token")); // ✅ ローカルストレージを確認
+      navigate("/scheduling", { replace: true });
+    } catch (error: any) {
+      console.error("Login failed:", error.response?.data || error.message);
+      message.error("ログインに失敗しました。" + error.message);
+    }
   };
 
   return (
@@ -27,7 +29,7 @@ const Login: React.FC = () => {
       <div className="logo-container">
         <div className="logo">
           <img
-            src={LoginIcon} 
+            src={LoginIcon}
             alt="Login Icon"
             style={{
               height: "200px",
@@ -41,7 +43,6 @@ const Login: React.FC = () => {
         layout="vertical"
         initialValues={{ remember: true }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         style={{ width: "300px", margin: "0 auto" }}
       >
         <Form.Item

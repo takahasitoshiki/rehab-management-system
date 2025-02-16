@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, message } from "antd";
 import { scheduleColumns } from "@/constants/scheduleColumns";
 import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
+import { useDrop } from "react-dnd"; // ✅ useDroppable ではなく useDrop を使用
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 dayjs.extend(isBetween);
@@ -10,7 +11,7 @@ type TimeSlot = {
   key: string;
   hour: string;
   minute: string;
-  patient: string;
+  patient: string | null;
 };
 
 interface Therapist {
@@ -22,12 +23,14 @@ interface TherapistScheduleTableProps {
   dataSource: TimeSlot[];
   handleRowDoubleClick: (record: TimeSlot) => void;
   selectedDates: [Dayjs, Dayjs] | null;
+  onDropPatient: (timeSlotKey: string, patientName: string) => void;
 }
 
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   dataSource,
   handleRowDoubleClick,
   selectedDates,
+  onDropPatient
 }) => {
   const [therapists, setTherapists] = useState<Therapist[]>([]);
   const [loading, setLoading] = useState<boolean>(!therapists.length);
@@ -50,12 +53,34 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     loadTherapists();
   }, []);
 
-  // ✅ `onCell` の修正: 既存の `onCell` を保持
+  // ✅ 各セルに `useDrop` を適用
+  const createDroppableCell = (record: TimeSlot) => {
+    const [{ isOver }, dropRef] = useDrop(() => ({
+      accept: "PATIENT", // `DraggablePatient` と一致させる
+      drop: (item: { name: string }) => {
+        console.log("ドロップされた:", item.name, "→", record.key);
+        onDropPatient(record.key, item.name);
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+      }),
+    }));
+
+    return {
+      ref: dropRef,
+      style: {
+        backgroundColor: isOver ? "#f0f0f0" : "white",
+      },
+      onDoubleClick: () => handleRowDoubleClick(record),
+    };
+  };
+
+  // ✅ `onCell` の修正
   const modifiedColumns = scheduleColumns.map((column) => ({
     ...column,
     onCell: (record: TimeSlot, index?: number) => ({
-      ...(column.onCell ? column.onCell(record, index ?? 0) : {}), // ✅ `index` を追加
-      onDoubleClick: () => handleRowDoubleClick(record),
+      ...(column.onCell ? column.onCell(record, index ?? 0) : {}),
+      ...createDroppableCell(record), // ✅ `useDrop` の適用
     }),
   }));
 

@@ -1,5 +1,7 @@
 const MongoStore = require('connect-mongo');
 require('dotenv').config(); // .envを読み込む
+console.log("JWT_SECRET:", process.env.JWT_SECRET); // ✅ ここでログを確認
+
 
 // セッション管理の設定
 const sessionConfig = {

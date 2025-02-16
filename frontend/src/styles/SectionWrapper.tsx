@@ -8,9 +8,7 @@ const sectionStyle: React.CSSProperties = {
   height: "95%", 
   overflow: "auto",
   maxWidth: "120vw",
-
 };
-
 
 interface SectionWrapperProps {
   children: React.ReactNode; // 子要素を受け取る

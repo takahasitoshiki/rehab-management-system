@@ -8,7 +8,6 @@ import { fetchPatientsList } from "@/services/patients/fetchPatients";
 
 
 interface Patient {
-  _id: string;
   patients_code: string;
   patients_name: string;
   classification: string;
@@ -24,7 +23,10 @@ type TimeSlot = {
 };
 
 interface ScheduleListProps {
-  selectedDates: [Dayjs, Dayjs]; // ✅ 受け取る
+  selectedDates: [Dayjs, Dayjs]; 
+  onDropPatient: (timeSlotKey: string, patientName: string) => void; 
+  dataSource: TimeSlot[]; 
+  setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>; 
 }
 
 const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
@@ -32,6 +34,9 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [form] = Form.useForm();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(false);
+  const [dataSource, setDataSource] = useState<TimeSlot[]>(generateTimeSlots());
+  
+
 
   useEffect(() => {
     const loadPatients = async () => {
@@ -49,9 +54,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     };
     loadPatients();
   }, []);
-
-  // データソース
-  const dataSource: TimeSlot[] = generateTimeSlots();
 
   const generateTimeOptions = () => {
     const times: string[] = [];
@@ -77,13 +79,22 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     setIsModalVisible(true);
   };
 
+  const onDropPatient = (timeSlotKey: string, patientName: string) => {
+    setDataSource((prevData) =>
+      prevData.map((slot) =>
+        slot.key === timeSlotKey ? { ...slot, patient: patientName } : slot
+      )
+    );
+  };
+
   return (
     <SectionWrapper>
-      {/* ✅ TherapistScheduleTable コンポーネントを利用 */}
+      {/* TherapistScheduleTable コンポーネントを利用 */}
       <TherapistScheduleTable
         dataSource={dataSource}
         handleRowDoubleClick={handleRowDoubleClick}
         selectedDates={selectedDates}
+        onDropPatient={onDropPatient} 
       />
 
       {/* 予約ダイアログ */}
@@ -104,7 +115,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
           >
             <Select placeholder="患者名" loading={loading}>
               {patients.map((patient) => (
-                <Option key={patient._id} value={patient.patients_name}>
+                <Option key={patient.patients_code} value={patient.patients_name}>
                   {patient.patients_name}
                 </Option>
               ))}
