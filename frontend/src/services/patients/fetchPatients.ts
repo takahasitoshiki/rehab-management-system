@@ -28,7 +28,6 @@ export const fetchPatientsList = async () => {
 export const fetchPatientsRegister = async (patientData: Patient) => {
     try{
         const response = await axios.post(`${VITE_APP_PATIENTS_URL}`, patientData); // テンプレートリテラルを修正
-        console.log("登録レスポンス:"+ response.data)
         return response.data; // 必要ならば .data を抽出
     }catch(error){
         console.error("API呼び出し中にエラーが発生しました:", error);

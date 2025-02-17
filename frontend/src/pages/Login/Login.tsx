@@ -13,14 +13,17 @@ const Login: React.FC = () => {
   const onFinish = async (values: { username: string; password: string }) => {
     try {
       const data = await login(values.username, values.password);
-      console.log("Received token:", data.token); // ✅ APIのレスポンスを確認
       localStorage.setItem("token", data.token);
       setAuth();
-      console.log("Stored token:", localStorage.getItem("token")); // ✅ ローカルストレージを確認
       navigate("/scheduling", { replace: true });
-    } catch (error: any) {
-      console.error("Login failed:", error.response?.data || error.message);
-      message.error("ログインに失敗しました。" + error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Login failed:", error.message);
+        message.error("ログインに失敗しました。" + error.message);
+      } else {
+        console.error("Unexpected error:", error);
+        message.error("予期しないエラーが発生しました。");
+      }
     }
   };
 

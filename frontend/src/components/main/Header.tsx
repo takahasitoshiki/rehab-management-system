@@ -94,7 +94,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   ) => {
     if (sectionKey) {
       // セクションを表示
-      console.log("sectionKey:", sectionKey);
       setVisibleSections((prev) => ({
         ...prev,
         [sectionKey]: true,

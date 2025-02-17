@@ -1,8 +1,10 @@
-// ✅ `AuthContext.ts` に Context のみ定義
 import { createContext } from "react";
 
-export const AuthContext = createContext({
-  isAuthenticated: false,
-  login: () => {},
-  logout: () => {},
-});
+interface AuthContextType {
+  isAuthenticated: boolean;
+  login: () => void;
+  logout: () => void;
+}
+
+// ✅ React Fast Refresh の警告を回避するため、コンテキストだけを定義
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
