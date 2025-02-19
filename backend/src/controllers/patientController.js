@@ -3,8 +3,60 @@ const Patient = require("../models/patient");
 // 患者登録
 exports.registerPatient = async (req, res) => {
   try {
-    const patient = new Patient(req.body);
-    const savedPatient = await patient.save();
+    // 最新の患者コードを入手
+    const lastPatient = await Patient.findOne({}, "patients_code")
+      .sort({ patients_code: -1 })
+      .lean();
+    console.log("latest patient code:", lastPatient.patients_code);
+
+    // patients_codeの処理
+    let newCode =
+      lastPatient && lastPatient.patients_code
+        ? parseInt(lastPatient.patients_code.replace("PA", ""), 10) + 1
+        : 1;
+
+    if (Number.isNaN(newCode)) {
+      console.warn(
+        "⚠ patients_code の取得に失敗しました。デフォルトの 'PA001' を使用します。"
+      );
+      newCode = 1; // 変数名を合わせる
+    }
+
+    const nextPatientCode = `PA${String(newCode).padStart(3, "0")}`;
+
+    // 🔹 患者コードの重複チェック
+    const existingPatient = await Patient.findOne({
+      patients_code: nextPatientCode,
+    });
+    if (existingPatient) {
+      return res.status(400).json({ message: "患者コードが重複しています" });
+    }
+
+    // 4. リクエストボディからデータを受け取り、患者情報を作成
+    const {
+      patients_name,
+      disease_name,
+      classification,
+      date_of_birth,
+      gender,
+      registration_date,
+      treatment_plan,
+      note,
+    } = req.body;
+
+    const newPatient = new Patient({
+      patients_code: nextPatientCode,
+      patients_name,
+      disease_name,
+      classification,
+      date_of_birth,
+      gender,
+      registration_date,
+      treatment_plan,
+      note,
+    });
+
+    const savedPatient = await newPatient.save();
     res
       .status(201)
       .json({ message: "患者情報が登録されました", patient: savedPatient });

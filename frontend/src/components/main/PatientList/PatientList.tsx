@@ -10,6 +10,11 @@ interface Patient {
   patients_name: string;
   classification: string;
 }
+interface RowProps {
+  children: React.ReactNode;
+  "data-row-key"?: string;
+  patients: Patient[]; // ✅ `patients` を追加
+}
 
 const PatientList: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -39,27 +44,38 @@ const PatientList: React.FC = () => {
   }, []);
 
   // ✅ ドラッグ可能な行コンポーネント
-  const DraggableRow: React.FC<{ record: Patient; index: number }> = ({
-    record,
+  const DraggableRow: React.FC<{ children: React.ReactNode; "data-row-key"?: string; patients: Patient[] }> = ({
+    children,
+    "data-row-key": dataRowKey,
+    patients,
     ...props
   }) => {
+  
+    // `record` を `patients` から取得
+    const record = dataRowKey ? patients.find((p) => p._id === dataRowKey) : null;
+  
+    // `useDrag` を常に呼び出す
     const [{ isDragging }, drag] = useDrag({
       type: "PATIENT",
-      item: { patient: record }, // ドラッグするデータ
+      item: () => {
+        return record ? { patient: record } : { patient: null }; // ✅ `record` が null でも `useDrag` を実行
+      },
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
     });
-
+  
     return (
       <tr
         {...props}
-        ref={drag}
+        ref={record ? drag : undefined} // ✅ `record` があるときだけ `drag` を適用
         style={{
           opacity: isDragging ? 0.5 : 1,
-          cursor: "move",
+          cursor: record ? "move" : "default", // ✅ `record` がない場合はカーソルを変更
         }}
-      />
+      >
+        {children}
+      </tr>
     );
   };
 
@@ -77,7 +93,9 @@ const PatientList: React.FC = () => {
           pagination={false}
           components={{
             body: {
-              row: DraggableRow, // 各行をドラッグ可能にする
+              row: (props) => {
+                return <DraggableRow {...props} patients={patients} />; // ✅ `patients` を渡す
+              },
             },
           }}
         />

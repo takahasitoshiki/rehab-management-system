@@ -39,7 +39,7 @@ const PatientRegistrationContent: React.FC = () => {
       >
         <Row gutter={16}>
           {/* 患者コード */}
-          <Col span={12}>
+          {/* <Col span={12}>
             <Form.Item
               name="patients_code"
               label="患者コード"
@@ -47,7 +47,7 @@ const PatientRegistrationContent: React.FC = () => {
             >
               <Input placeholder="例: PT006" />
             </Form.Item>
-          </Col>
+          </Col> */}
 
           {/* 患者名 */}
           <Col span={12}>
