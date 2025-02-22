@@ -38,16 +38,6 @@ const PatientRegistrationContent: React.FC = () => {
         }}
       >
         <Row gutter={16}>
-          {/* 患者コード */}
-          {/* <Col span={12}>
-            <Form.Item
-              name="patients_code"
-              label="患者コード"
-              rules={[{ required: true, message: "患者コードを入力してください" }]}
-            >
-              <Input placeholder="例: PT006" />
-            </Form.Item>
-          </Col> */}
 
           {/* 患者名 */}
           <Col span={12}>

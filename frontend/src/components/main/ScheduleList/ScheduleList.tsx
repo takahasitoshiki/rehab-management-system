@@ -17,7 +17,7 @@ type TimeSlot = {
   key: string;
   hour: string;
   minute: string;
-  patient: string | null; // <-- ここを修正
+  patient: string | null;
 };
 
 interface ScheduleListProps {
@@ -33,6 +33,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState<TimeSlot[]>(generateTimeSlots());
+  const [droppedPatient, setDroppedPatient ] = useState< Patient| null>(null)
 
   useEffect(() => {
     const loadPatients = async () => {
@@ -75,24 +76,31 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     setIsModalVisible(true);
   };
 
-  const onDropPatient = (timeSlotKey: string, patientName: string) => {
+  const onDropPatient = (timeSlotKey: string, patient: Patient) => {
     setDataSource((prevData) =>
       prevData.map((slot) =>
-        slot.key === timeSlotKey ? { ...slot, patient: patientName } : slot
+        slot.key === timeSlotKey ? { ...slot, patient: patient.patients_name } : slot
       )
     );
-  
-    // ドロップされた時間枠を取得
-    const droppedSlot = dataSource.find((slot) => slot.key === timeSlotKey);
+      const droppedSlot = dataSource.find((slot) => slot.key === timeSlotKey);
     if (droppedSlot) {
       form.setFieldsValue({
-        time: `${droppedSlot.hour}:${droppedSlot.minute}`, // ドロップされた行の時間データをセット
-        date: dayjs(), // 現在の日付を設定
+        time: `${droppedSlot.hour}:${droppedSlot.minute}`, 
+        date: dayjs(), 
       });
     }
-  
+    setDroppedPatient(patient)
     setIsModalVisible(true);
   };
+
+  useEffect(() => {
+    if(isModalVisible && droppedPatient){
+      form.setFieldsValue({
+        patientName:droppedPatient.patients_name,
+        date: dayjs(),
+      })
+    }
+  },[isModalVisible, droppedPatient, form])
 
   return (
     <SectionWrapper>

@@ -31,7 +31,7 @@ interface TherapistScheduleTableProps {
   dataSource: TimeSlot[];
   handleRowDoubleClick: (record: TimeSlot) => void;
   selectedDates: [Dayjs, Dayjs] | null;
-  onDropPatient: (timeSlotKey: string, patientName: string) => void;
+  onDropPatient: (timeSlotKey: string, patientName: Patient) => void;
 }
 
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
@@ -68,10 +68,11 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       drop: (item: { patient?: Patient }) => {
         console.log("ドロップされたデータ:", item); // itemの中身を確認
         if (!record || !item.patient) return; // record または patient が undefined なら処理を中断
-        onDropPatient(record.key, item); // ドロップ時に患者データを渡す
-        console.log("患者名:"+item )
+        onDropPatient(record.key, item.patient); 
+        console.log("患者名:"+item.patient.patients_name )
       },
       collect: (monitor) => ({
+        
         isOver: !!monitor.isOver(),
       }),
     }));

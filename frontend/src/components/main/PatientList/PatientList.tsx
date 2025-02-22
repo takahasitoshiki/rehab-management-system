@@ -10,11 +10,6 @@ interface Patient {
   patients_name: string;
   classification: string;
 }
-interface RowProps {
-  children: React.ReactNode;
-  "data-row-key"?: string;
-  patients: Patient[]; // ✅ `patients` を追加
-}
 
 const PatientList: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);

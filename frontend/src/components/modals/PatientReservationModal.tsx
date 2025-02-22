@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Modal, Form, Input, Select, DatePicker, FormInstance } from "antd";
+import dayjs from "dayjs";
+
 
 interface Patient {
   patients_code: string;
@@ -13,6 +15,7 @@ interface PatientReservationModalProps {
   patients: Patient[];
   loading: boolean;
   generateTimeOptions: () => string[];
+  droppedPatient?: Patient | null; // ✅ 追加
 }
 
 const { Option } = Select;
@@ -24,7 +27,21 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
   patients,
   loading,
   generateTimeOptions,
+  droppedPatient,  // ドロップされた患者情報を受け取る
+
 }) => {
+
+  useEffect(() => {
+    console.log("✅ モーダルが開いた (isModalVisible):", isModalVisible);
+    console.log("✅ droppedPatient:", droppedPatient); // デバッグ出力
+    if (isModalVisible && droppedPatient) {
+      form.setFieldsValue({
+        patientName: droppedPatient.patients_name,
+        date: dayjs(), // ✅ 日付セット
+      });
+    }
+  }, [isModalVisible, droppedPatient, form]);
+
   return (
     <Modal
       title="患者予約"
