@@ -1,7 +1,12 @@
 import React, { useEffect } from "react";
-import { Modal, Form, Input, Select, DatePicker, FormInstance } from "antd";
+import { Modal, Form, Input, Select, DatePicker, FormInstance, message } from "antd";
+import { ReservationRequest, createReservation } from "@/services/reservation/fetchReservation"
 import dayjs from "dayjs";
 
+interface Therapist {
+  therapist_id: string;
+  username: string;
+}
 
 interface Patient {
   patients_code: string;
@@ -15,7 +20,8 @@ interface PatientReservationModalProps {
   patients: Patient[];
   loading: boolean;
   generateTimeOptions: () => string[];
-  droppedPatient?: Patient | null; // ✅ 追加
+  droppedPatient?: Patient | null; 
+  therapistId:Therapist;
 }
 
 const { Option } = Select;
@@ -27,13 +33,15 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
   patients,
   loading,
   generateTimeOptions,
-  droppedPatient,  // ドロップされた患者情報を受け取る
-
+  droppedPatient,  
+  therapistId
 }) => {
 
   useEffect(() => {
     console.log("✅ モーダルが開いた (isModalVisible):", isModalVisible);
     console.log("✅ droppedPatient:", droppedPatient); // デバッグ出力
+    console.log("✅ therapistId:", therapistId); // ✅ therapistId のデバッグ出力
+
     if (isModalVisible && droppedPatient) {
       form.setFieldsValue({
         patientName: droppedPatient.patients_name,
@@ -42,11 +50,34 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
     }
   }, [isModalVisible, droppedPatient, form]);
 
+  const onSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+
+      const requestData: ReservationRequest = {
+        patient_code: patients.find((p) => p.patients_name === values.patientName)?.patients_code || "",
+        therapist_id: therapistId.therapist_id, // ✅ `therapist_id` を正しく渡す
+        date: values.date.format("YYYY-MM-DD"),
+        time: values.time,
+        note: values.remarks || "",
+      };
+
+      await createReservation(requestData); // ✅ 分離したAPI関数を呼び出し
+      message.success("予約が登録されました");
+
+      form.resetFields();
+      setIsModalVisible(false);
+    } catch (error) {
+      console.error(error)
+      message.error("予約の登録に失敗しました");
+    }
+  };
+
   return (
     <Modal
       title="患者予約"
       open={isModalVisible}
-      onOk={() => setIsModalVisible(false)}
+      onOk={onSubmit}
       onCancel={() => setIsModalVisible(false)}
       okText="予約"
       cancelText="キャンセル"

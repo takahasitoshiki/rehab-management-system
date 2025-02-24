@@ -2,17 +2,11 @@ import React, { useState } from "react";
 import MainHeader from "./MainHeader";
 import PatientList from "./PatientList/PatientList";
 import ScheduleList from "./ScheduleList/ScheduleList";
-import AchievementList from "./AchievementList/AchievementList";
+// import AchievementList from "./AchievementList/AchievementList";
 import { Dayjs } from "dayjs";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-
-type TimeSlot = {
-  key: string;
-  hour: string;
-  minute: string;
-  patient: string;
-};
+import { TimeSlot } from "@/types/timeSlot";
 
 interface MainContentProps {
   visibleSections: {
@@ -101,7 +95,7 @@ const MainContent: React.FC<MainContentProps> = ({
         {visibleSections.achievements && (
           <div style={{ ...getSectionStyle("achievements"), flex: 4, overflowX: "hidden", minWidth: "500px" }}>
             <MainHeader title="実績一覧" onClose={() => handleClose("achievements")} onMaximize={() => handleMaximize("achievements")} />
-            <AchievementList selectedDates={selectedDates} />
+            {/* <AchievementList selectedDates={selectedDates} /> */}
           </div>
         )}
       </div>

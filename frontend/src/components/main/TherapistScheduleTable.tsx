@@ -5,15 +5,10 @@ import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
 import { useDrop } from "react-dnd"; // ✅ useDroppable ではなく useDrop を使用
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import { TimeSlot } from "@/types/timeSlot";
 
 dayjs.extend(isBetween);
 
-type TimeSlot = {
-  key: string;
-  hour: string;
-  minute: string;
-  patient: string | null;
-};
 
 interface Therapist {
   therapist_id: string;
@@ -62,7 +57,7 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   }, []);
 
   // ✅ 各セルに `useDrop` を適用
-  const createDroppableCell = (record: TimeSlot) => {
+  const createDroppableCell = (record: TimeSlot, ) => {
     const [{ isOver }, dropRef] = useDrop(() => ({
       accept: "PATIENT", // `DraggablePatient` と一致させる
       drop: (item: { patient?: Patient }) => {
@@ -94,6 +89,14 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       ...createDroppableCell(record), // ✅ 修正済みの関数を適用
     }),
   }));
+
+  useEffect(() => {
+    console.log("📊 現在の dataSource:", dataSource);
+  }, [dataSource]);
+
+  useEffect(() => {
+    console.log("📊 現在の modifiedColumns:", modifiedColumns);
+  }, [modifiedColumns]);
 
   return (
     <div

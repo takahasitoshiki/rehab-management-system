@@ -6,19 +6,13 @@ import dayjs, { Dayjs } from "dayjs";
 import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
 import { fetchPatientsList } from "@/services/patients/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
+import { TimeSlot } from "@/types/timeSlot";
 
 interface Patient {
   patients_code: string;
   patients_name: string;
   classification: string;
 }
-
-type TimeSlot = {
-  key: string;
-  hour: string;
-  minute: string;
-  patient: string | null;
-};
 
 interface ScheduleListProps {
   selectedDates: [Dayjs, Dayjs];
@@ -32,7 +26,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [form] = Form.useForm();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(false);
-  const [dataSource, setDataSource] = useState<TimeSlot[]>(generateTimeSlots());
+  const [dataSource, setDataSource] = useState<TimeSlot[]>([]);
   const [droppedPatient, setDroppedPatient ] = useState< Patient| null>(null)
 
   useEffect(() => {
@@ -42,6 +36,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         const data = await fetchPatientsList();
         if (!Array.isArray(data)) throw new Error("データが配列ではありません");
         setPatients(data);
+        setDataSource(generateTimeSlots(data || [])); // ✅ `undefined` の場合、空配列を渡す
       } catch (error) {
         console.error("エラー:", error);
         message.error("患者情報の取得に失敗しました。");
@@ -76,7 +71,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     setIsModalVisible(true);
   };
 
-  const onDropPatient = (timeSlotKey: string, patient: Patient) => {
+  const onDropPatient = (timeSlotKey: string, patient: Patient, therapistId: string) => {
     setDataSource((prevData) =>
       prevData.map((slot) =>
         slot.key === timeSlotKey ? { ...slot, patient: patient.patients_name } : slot
@@ -89,6 +84,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         date: dayjs(), 
       });
     }
+    setSelectedTherapistId(therapistId); // ✅ therapist_id を保存
     setDroppedPatient(patient)
     setIsModalVisible(true);
   };
