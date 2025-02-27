@@ -7,7 +7,8 @@ import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
 import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
 
-interface Patient {
+export interface Patient {
+  _id: string;
   patients_code: string;
   patients_name: string;
   classification: string;
@@ -102,6 +103,9 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     }
   },[isModalVisible, droppedPatient, form])
 
+  console.log("取得した患者データaaaaa:", JSON.stringify(patients, null, 2));
+
+
   return (
     <SectionWrapper>
       {/* TherapistScheduleTable コンポーネントを利用 */}
@@ -110,6 +114,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         handleRowDoubleClick={handleRowDoubleClick}
         selectedDates={selectedDates}
         onDropPatient={onDropPatient}
+        patients={patients} // ✅ 追加
       />
 
       {/* 予約ダイアログ */}

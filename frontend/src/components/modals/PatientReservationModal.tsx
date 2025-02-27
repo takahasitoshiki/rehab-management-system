@@ -38,7 +38,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
 
       const requestData: ReservationRequest = {
         patient_code: patients.find((p) => p.patients_name === values.patientName)?.patients_code || "",
-        therapist_id: "P15000", // ✅ 
+        therapist_id: "PT002", // ✅ 
         date: values.date.format("YYYY-MM-DD"),
         time: values.time,
         note: values.remarks || "",
@@ -49,6 +49,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
 
       form.resetFields();
       setIsModalVisible(false);
+      window.location.reload() 
     } catch (error) {
       console.error(error)
       message.error("予約の登録に失敗しました");
