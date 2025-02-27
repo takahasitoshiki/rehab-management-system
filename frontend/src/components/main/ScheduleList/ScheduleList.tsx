@@ -5,8 +5,10 @@ import { generateTimeSlots } from "@/utils/timeSlotGenerator";
 import dayjs, { Dayjs } from "dayjs";
 import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
 import { fetchPatientsList } from "@/services/patients/fetchPatients";
+import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
 import { TimeSlot } from "@/types/timeSlot";
+import { Therapist } from "@/types/therapists";
 
 interface Patient {
   patients_code: string;
@@ -25,26 +27,47 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [therapists, setTherapists] = useState<Therapist[]>([]); // ✅ therapists を追加
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState<TimeSlot[]>([]);
-  const [droppedPatient, setDroppedPatient ] = useState< Patient| null>(null)
+  const [droppedPatient, setDroppedPatient] = useState<Patient | null>(null);
+  const [selectedTherapistId, setSelectedTherapistId] =
+    useState<Therapist | null>(null);
 
   useEffect(() => {
-    const loadPatients = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        const data = await fetchPatientsList();
-        if (!Array.isArray(data)) throw new Error("データが配列ではありません");
-        setPatients(data);
-        setDataSource(generateTimeSlots(data || [])); // ✅ `undefined` の場合、空配列を渡す
+
+        // ✅ `fetchPatientsList()` と `fetchTherapistList()` を並行処理
+        const [patientData, therapistData] = await Promise.all([
+          fetchPatientsList(),
+          fetchTherapistList(),
+        ]);
+
+        if (!Array.isArray(patientData) || !Array.isArray(therapistData)) {
+          throw new Error("データが配列ではありません");
+        }
+        console.log("現在の therapists:", therapists);
+        if (!therapists) {
+          console.error("❌ therapists が undefined になっています！");
+        }
+
+        console.log("取得した患者データ:", patientData);
+        console.log("取得したセラピストデータ:", therapistData);
+
+        setPatients(patientData);
+        setTherapists(therapistData); // ✅ 修正: `setTherapists` を適用
+        setDataSource(generateTimeSlots(therapistData || [])); // ✅ therapists を渡す
       } catch (error) {
         console.error("エラー:", error);
-        message.error("患者情報の取得に失敗しました。");
+        message.error("データの取得に失敗しました。");
       } finally {
         setLoading(false);
       }
     };
-    loadPatients();
+
+    loadData();
   }, []);
 
   const generateTimeOptions = () => {
@@ -67,37 +90,51 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
       time: `${record.hour}:${record.minute}`, // クリックした行の時間データをセット
       date: dayjs(), // 予約日を現在の日付に設定
     });
-
     setIsModalVisible(true);
   };
 
-  const onDropPatient = (timeSlotKey: string, patient: Patient, therapistId: string) => {
+  const onDropPatient = (
+    timeSlotKey: string,
+    patient: Patient,
+    therapist: Therapist
+  ) => {
     setDataSource((prevData) =>
       prevData.map((slot) =>
-        slot.key === timeSlotKey ? { ...slot, patient: patient.patients_name } : slot
+        slot.key === timeSlotKey
+          ? { ...slot, patient: patient.patients_name }
+          : slot
       )
     );
-      const droppedSlot = dataSource.find((slot) => slot.key === timeSlotKey);
+    const droppedSlot = dataSource.find((slot) => slot.key === timeSlotKey) || {
+      hour: "00",
+      minute: "00",
+    };
     if (droppedSlot) {
       form.setFieldsValue({
-        time: `${droppedSlot.hour}:${droppedSlot.minute}`, 
-        date: dayjs(), 
+        time: `${droppedSlot.hour}:${droppedSlot.minute}`,
+        date: dayjs(),
       });
     }
-    setSelectedTherapistId(therapistId); // ✅ therapist_id を保存
-    setDroppedPatient(patient)
+    setSelectedTherapistId(therapist); // ✅ Therapist オブジェクトを保存
+    setDroppedPatient(patient);
     setIsModalVisible(true);
   };
 
   useEffect(() => {
-    if(isModalVisible && droppedPatient){
+    if (isModalVisible && droppedPatient) {
       form.setFieldsValue({
-        patientName:droppedPatient.patients_name,
+        patientName: droppedPatient.patients_name,
         date: dayjs(),
-      })
+      });
     }
-  },[isModalVisible, droppedPatient, form])
+  }, [isModalVisible, droppedPatient, form]);
 
+  console.log("🛠 therapists の現在の状態:", therapists);
+
+  if (!therapists || therapists.length === 0) {
+    console.error("❌ therapists が undefined または 空の配列です！");
+    return <p>セラピスト情報が取得できませんでした。</p>; // `undefined` の場合はエラーメッセージを表示
+  }
   return (
     <SectionWrapper>
       {/* TherapistScheduleTable コンポーネントを利用 */}
@@ -106,6 +143,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         handleRowDoubleClick={handleRowDoubleClick}
         selectedDates={selectedDates}
         onDropPatient={onDropPatient}
+        therapists={therapists || []}
       />
 
       {/* 予約ダイアログ */}
@@ -116,6 +154,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         patients={patients}
         loading={loading}
         generateTimeOptions={generateTimeOptions}
+        selectedTherapist={selectedTherapistId} // ✅ selectedTherapistId を渡す
       />
     </SectionWrapper>
   );

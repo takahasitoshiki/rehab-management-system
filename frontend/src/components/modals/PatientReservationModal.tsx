@@ -1,6 +1,17 @@
 import React, { useEffect } from "react";
-import { Modal, Form, Input, Select, DatePicker, FormInstance, message } from "antd";
-import { ReservationRequest, createReservation } from "@/services/reservation/fetchReservation"
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  FormInstance,
+  message,
+} from "antd";
+import {
+  ReservationRequest,
+  createReservation,
+} from "@/services/reservation/fetchReservation";
 import dayjs from "dayjs";
 
 interface Therapist {
@@ -20,8 +31,8 @@ interface PatientReservationModalProps {
   patients: Patient[];
   loading: boolean;
   generateTimeOptions: () => string[];
-  droppedPatient?: Patient | null; 
-  therapistId:Therapist;
+  droppedPatient?: Patient | null;
+  selectedTherapist: Therapist | null; // ✅ 追加
 }
 
 const { Option } = Select;
@@ -33,14 +44,13 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
   patients,
   loading,
   generateTimeOptions,
-  droppedPatient,  
-  therapistId
+  droppedPatient,
+  selectedTherapist,
 }) => {
-
   useEffect(() => {
     console.log("✅ モーダルが開いた (isModalVisible):", isModalVisible);
     console.log("✅ droppedPatient:", droppedPatient); // デバッグ出力
-    console.log("✅ therapistId:", therapistId); // ✅ therapistId のデバッグ出力
+    console.log("✅ therapistId:", selectedTherapist); // ✅ therapistId のデバッグ出力
 
     if (isModalVisible && droppedPatient) {
       form.setFieldsValue({
@@ -55,8 +65,10 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
       const values = await form.validateFields();
 
       const requestData: ReservationRequest = {
-        patient_code: patients.find((p) => p.patients_name === values.patientName)?.patients_code || "",
-        therapist_id: therapistId.therapist_id, // ✅ `therapist_id` を正しく渡す
+        patient_code:
+          patients.find((p) => p.patients_name === values.patientName)
+            ?.patients_code || "",
+        therapist_id: selectedTherapist ?? { therapist_id: "", username: "" }, // ✅ `null` の場合、デフォルト値を設定
         date: values.date.format("YYYY-MM-DD"),
         time: values.time,
         note: values.remarks || "",
@@ -68,7 +80,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
       form.resetFields();
       setIsModalVisible(false);
     } catch (error) {
-      console.error(error)
+      console.error(error);
       message.error("予約の登録に失敗しました");
     }
   };

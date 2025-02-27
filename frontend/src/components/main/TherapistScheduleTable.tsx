@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Table, message } from "antd";
+import React from "react";
+import { Table } from "antd";
 import { scheduleColumns } from "@/constants/scheduleColumns";
-import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
-import { useDrop } from "react-dnd"; // ✅ useDroppable ではなく useDrop を使用
+import { useDrop } from "react-dnd";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { TimeSlot } from "@/types/timeSlot";
 
 dayjs.extend(isBetween);
 
-
 interface Therapist {
   therapist_id: string;
   username: string;
 }
 
- interface Patient {
+interface Patient {
   _id: string;
   patients_code: string;
   patients_name: string;
@@ -26,77 +24,85 @@ interface TherapistScheduleTableProps {
   dataSource: TimeSlot[];
   handleRowDoubleClick: (record: TimeSlot) => void;
   selectedDates: [Dayjs, Dayjs] | null;
-  onDropPatient: (timeSlotKey: string, patientName: Patient) => void;
+  onDropPatient: (
+    timeSlotKey: string,
+    patientName: Patient,
+    therapists: Therapist
+  ) => void;
+  therapists: Therapist[]; // ✅ therapists を追加
 }
 
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   dataSource,
   handleRowDoubleClick,
   selectedDates,
-  onDropPatient
+  onDropPatient,
+  therapists,
 }) => {
-  const [therapists, setTherapists] = useState<Therapist[]>([]);
-  const [loading, setLoading] = useState<boolean>(!therapists.length);
-
-  useEffect(() => {
-    const loadTherapists = async () => {
-      try {
-        const therapistData = await fetchTherapistList();
-        if (!Array.isArray(therapistData)) {
-          throw new Error("取得したデータが配列ではありません！");
-        }
-        setTherapists(therapistData);
-      } catch (error) {
-        console.error("エラー内容:", error);
-        message.error("セラピスト情報の取得に失敗しました。");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadTherapists();
-  }, []);
-
-  // ✅ 各セルに `useDrop` を適用
-  const createDroppableCell = (record: TimeSlot, ) => {
+  const DroppableCell: React.FC<{
+    record: TimeSlot;
+    onDropPatient: (
+      key: string,
+      patient: Patient,
+      therapist: Therapist
+    ) => void;
+    handleRowDoubleClick: (record: TimeSlot) => void;
+  }> = ({ record, onDropPatient, handleRowDoubleClick }) => {
     const [{ isOver }, dropRef] = useDrop(() => ({
-      accept: "PATIENT", // `DraggablePatient` と一致させる
+      accept: "PATIENT",
+
       drop: (item: { patient?: Patient }) => {
-        console.log("ドロップされたデータ:", item); // itemの中身を確認
-        if (!record || !item.patient) return; // record または patient が undefined なら処理を中断
-        onDropPatient(record.key, item.patient); 
-        console.log("患者名:"+item.patient.patients_name )
+        if (!record || !item.patient) return;
+
+        const foundTherapist = therapists.find(
+          (t) => t.therapist_id === record.therapist_id
+        );
+        if (!foundTherapist) {
+          console.warn(
+            `⚠ Therapist ID (${record.therapist_id}) が見つかりません`
+          );
+          return;
+        }
+
+        onDropPatient(record.key, item.patient, foundTherapist);
       },
       collect: (monitor) => ({
-        
         isOver: !!monitor.isOver(),
       }),
     }));
 
-    return {
-      ref: dropRef,
-      style: {
-        backgroundColor: isOver ? "#f0f0f0" : "white",
-      },
-      onDoubleClick: () => handleRowDoubleClick(record),
-    };
+    return (
+      <div
+        ref={dropRef} // ✅ useDrop を適用
+        style={{
+          backgroundColor: isOver ? "#f0f0f0" : "white",
+        }}
+        onDoubleClick={() => handleRowDoubleClick(record)}
+      >
+        {record.patient || ""}
+      </div>
+    );
   };
 
-  // ✅ `onCell` の修正
   const modifiedColumns = scheduleColumns.map((column) => ({
     ...column,
-    onCell: (record: TimeSlot, index?: number) => ({
-      ...(column.onCell ? column.onCell(record, index ?? 0) : {}),
-      ...createDroppableCell(record), // ✅ 修正済みの関数を適用
+    onCell: (record: TimeSlot) => ({
+      children: (
+        <DroppableCell
+          record={record}
+          onDropPatient={onDropPatient}
+          handleRowDoubleClick={handleRowDoubleClick}
+        />
+      ),
     }),
   }));
 
-  useEffect(() => {
-    console.log("📊 現在の dataSource:", dataSource);
-  }, [dataSource]);
+  console.log("🛠 therapists の現在の状態:", therapists);
 
-  useEffect(() => {
-    console.log("📊 現在の modifiedColumns:", modifiedColumns);
-  }, [modifiedColumns]);
+if (!therapists || therapists.length === 0) {
+  console.error("❌ therapists が undefined または 空の配列です！");
+  return <p>セラピスト情報が取得できませんでした。</p>; // `undefined` の場合はエラーメッセージを表示
+}
 
   return (
     <div
@@ -137,9 +143,9 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
         }
 
         return dateList.map((date) =>
-          therapists.map((therapist) => (
+          therapists.map((therapist: Therapist) => (
             <div
-              key={`${therapist.therapist_id}-${date.format("YYYY-MM-DD")}`}
+              key={therapist.therapist_id}
               style={{
                 flexShrink: 0,
                 minWidth: "250px",
@@ -152,8 +158,7 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
                 title={() =>
                   `${therapist.username} (${date.format("YYYY-MM-DD")})`
                 }
-                dataSource={dataSource}
-                loading={loading}
+                dataSource={dataSource} 
                 pagination={false}
                 bordered
                 size="small"

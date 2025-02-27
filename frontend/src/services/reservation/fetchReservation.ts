@@ -1,9 +1,11 @@
+import { Therapist } from "@/types/therapists"
+
 const VITE_APP_RESERVATION_URL = import.meta.env.VITE_APP_RESERVATION_URL
 
 export interface ReservationRequest {
     patient_code: string;
-    therapist_id: string;
-    date: string;
+    therapist_id: Therapist | null;
+        date: string;
     time: string;
     note?: string;
   }
