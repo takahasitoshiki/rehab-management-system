@@ -4,13 +4,13 @@ import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots } from "@/utils/timeSlotGenerator";
 import dayjs, { Dayjs } from "dayjs";
 import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
-import { fetchPatientsList } from "@/services/patients/fetchPatients";
-import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
+import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
 import { TimeSlot } from "@/types/timeSlot";
 import { Therapist } from "@/types/therapists";
 
-interface Patient {
+export interface Patient {
+  _id: string;
   patients_code: string;
   patients_name: string;
   classification: string;
@@ -130,11 +130,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   }, [isModalVisible, droppedPatient, form]);
 
   console.log("🛠 therapists の現在の状態:", therapists);
-
-  if (!therapists || therapists.length === 0) {
-    console.error("❌ therapists が undefined または 空の配列です！");
-    return <p>セラピスト情報が取得できませんでした。</p>; // `undefined` の場合はエラーメッセージを表示
-  }
+  console.log("取得した患者データaaaaa:", JSON.stringify(patients, null, 2));
   return (
     <SectionWrapper>
       {/* TherapistScheduleTable コンポーネントを利用 */}
@@ -143,7 +139,8 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         handleRowDoubleClick={handleRowDoubleClick}
         selectedDates={selectedDates}
         onDropPatient={onDropPatient}
-        therapists={therapists || []}
+        patients={patients} // ✅ 追加
+
       />
 
       {/* 予約ダイアログ */}

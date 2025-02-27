@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Input, Select, DatePicker, Button, message, Row, Col } from "antd";
 import dayjs from "dayjs";
-import { Patient, fetchPatientsRegister } from "@/services/patients/fetchPatients";
+import { Patient, fetchPatientsRegister } from "@/api/fetchPatients";
 
 
 const { Option } = Select;

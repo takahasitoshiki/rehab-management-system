@@ -4,9 +4,8 @@ import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots } from "@/utils/timeSlotGenerator";
 import dayjs, { Dayjs } from "dayjs";
 import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
-import { fetchPatientsList } from "@/services/patients/fetchPatients";
+import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
-import { TimeSlot } from "@/types/timeSlot";
 
 interface Patient {
   patients_code: string;
@@ -14,6 +13,12 @@ interface Patient {
   classification: string;
 }
 
+type TimeSlot = {
+  key: string;
+  hour: string;
+  minute: string;
+  patient: string | null;
+};
 interface ScheduleListProps {
   selectedDates: [Dayjs, Dayjs];
   onDropPatient: (timeSlotKey: string, patientName: string) => void;
@@ -21,12 +26,12 @@ interface ScheduleListProps {
   setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>;
 }
 
-const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
+const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(false);
-  const [dataSource, setDataSource] = useState<TimeSlot[]>([]);
+  const [dataSource, setDataSource] = useState<TimeSlot[]>(generateTimeSlots());
   const [droppedPatient, setDroppedPatient ] = useState< Patient| null>(null)
 
   useEffect(() => {
@@ -71,7 +76,9 @@ const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     setIsModalVisible(true);
   };
 
-  const onDropPatient = (timeSlotKey: string, patient: Patient, therapistId: string) => {
+
+  const onDropPatient = (timeSlotKey: string, patient: Patient) => {
+
     setDataSource((prevData) =>
       prevData.map((slot) =>
         slot.key === timeSlotKey ? { ...slot, patient: patient.patients_name } : slot
@@ -84,7 +91,6 @@ const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         date: dayjs(), 
       });
     }
-    setSelectedTherapistId(therapistId); // ✅ therapist_id を保存
     setDroppedPatient(patient)
     setIsModalVisible(true);
   };
@@ -121,4 +127,4 @@ const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   );
 };
 
-export default AchievementList;
+export default ScheduleList;

@@ -3,10 +3,10 @@ import MainHeader from "./MainHeader";
 import PatientList from "./PatientList/PatientList";
 import ScheduleList from "./ScheduleList/ScheduleList";
 import AchievementList from "./AchievementList/AchievementList";
+import { TimeSlot } from "@/utils/timeSlotGenerator";
 import { Dayjs } from "dayjs";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { TimeSlot } from "@/types/timeSlot";
 
 interface MainContentProps {
   visibleSections: {
