@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Table, message } from "antd";
 import { scheduleColumns } from "@/constants/scheduleColumns";
-import { fetchTherapistList } from "@/services/therapist/fetchTherapist";
+import { fetchTherapistList } from "@/api/fetchTherapist";
 import { useDrop } from "react-dnd"; // ✅ useDroppable ではなく useDrop を使用
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import { TimeSlot } from "@/utils/timeSlotGenerator";
+
 
 dayjs.extend(isBetween);
 
-type TimeSlot = {
-  key: string;
-  hour: string;
-  minute: string;
-  patient: string | null;
-};
 
 interface Therapist {
   therapist_id: string;
@@ -61,13 +57,14 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     loadTherapists();
   }, []);
 
+
   // ✅ 各セルに `useDrop` を適用
   const createDroppableCell = (record: TimeSlot) => {
     const [{ isOver }, dropRef] = useDrop(() => ({
-      accept: "PATIENT", // `DraggablePatient` と一致させる
+      accept: "PATIENT", 
       drop: (item: { patient?: Patient }) => {
-        console.log("ドロップされたデータ:", item); // itemの中身を確認
-        if (!record || !item.patient) return; // record または patient が undefined なら処理を中断
+        console.log("ドロップされたデータ:", item); 
+        if (!record || !item.patient) return; 
         onDropPatient(record.key, item.patient); 
         console.log("患者名:"+item.patient.patients_name )
       },
@@ -86,14 +83,16 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     };
   };
 
-  // ✅ `onCell` の修正
   const modifiedColumns = scheduleColumns.map((column) => ({
     ...column,
     onCell: (record: TimeSlot, index?: number) => ({
       ...(column.onCell ? column.onCell(record, index ?? 0) : {}),
-      ...createDroppableCell(record), // ✅ 修正済みの関数を適用
+      ...createDroppableCell(record), 
     }),
   }));
+
+
+  
 
   return (
     <div

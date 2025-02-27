@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { message, Table, Spin } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
-import { fetchPatientsList } from "@/services/patients/fetchPatients";
+import { fetchPatientsList } from "@/api/fetchPatients";
 import { useDrag } from "react-dnd";
 
 interface Patient {

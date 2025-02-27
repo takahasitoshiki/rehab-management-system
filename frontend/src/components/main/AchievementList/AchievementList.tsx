@@ -1,36 +1,39 @@
-import React, { useState,useEffect } from "react";
-import { Modal, Form, Input, Select, DatePicker, message } from "antd";
+import React, { useState, useEffect } from "react";
+import { Form, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots } from "@/utils/timeSlotGenerator";
 import dayjs, { Dayjs } from "dayjs";
 import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
-import { fetchPatientsList } from "@/services/patients/fetchPatients";
+import { fetchPatientsList } from "@/api/fetchPatients";
+import PatientReservationModal from "@/components/modals/PatientReservationModal";
 
 interface Patient {
-  _id: string;
   patients_code: string;
   patients_name: string;
   classification: string;
 }
 
-const { Option } = Select;
-
 type TimeSlot = {
   key: string;
   hour: string;
   minute: string;
-  patient: string;
+  patient: string | null;
 };
 
 interface ScheduleListProps {
-  selectedDates: [Dayjs, Dayjs]; // ✅ 受け取る
+  selectedDates: [Dayjs, Dayjs];
+  onDropPatient: (timeSlotKey: string, patientName: string) => void;
+  dataSource: TimeSlot[];
+  setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>;
 }
 
-const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
+const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(false);
+  const [dataSource, setDataSource] = useState<TimeSlot[]>(generateTimeSlots());
+  const [droppedPatient, setDroppedPatient ] = useState< Patient| null>(null)
 
   useEffect(() => {
     const loadPatients = async () => {
@@ -48,9 +51,6 @@ const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     };
     loadPatients();
   }, []);
-
-  // データソース
-  const dataSource: TimeSlot[] = generateTimeSlots();
 
   const generateTimeOptions = () => {
     const times: string[] = [];
@@ -76,74 +76,53 @@ const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     setIsModalVisible(true);
   };
 
+  const onDropPatient = (timeSlotKey: string, patient: Patient) => {
+    setDataSource((prevData) =>
+      prevData.map((slot) =>
+        slot.key === timeSlotKey ? { ...slot, patient: patient.patients_name } : slot
+      )
+    );
+      const droppedSlot = dataSource.find((slot) => slot.key === timeSlotKey);
+    if (droppedSlot) {
+      form.setFieldsValue({
+        time: `${droppedSlot.hour}:${droppedSlot.minute}`, 
+        date: dayjs(), 
+      });
+    }
+    setDroppedPatient(patient)
+    setIsModalVisible(true);
+  };
+
+  useEffect(() => {
+    if(isModalVisible && droppedPatient){
+      form.setFieldsValue({
+        patientName:droppedPatient.patients_name,
+        date: dayjs(),
+      })
+    }
+  },[isModalVisible, droppedPatient, form])
+
   return (
     <SectionWrapper>
-      {/* ✅ TherapistScheduleTable コンポーネントを利用 */}
+      {/* TherapistScheduleTable コンポーネントを利用 */}
       <TherapistScheduleTable
         dataSource={dataSource}
         handleRowDoubleClick={handleRowDoubleClick}
         selectedDates={selectedDates}
+        onDropPatient={onDropPatient}
       />
 
       {/* 予約ダイアログ */}
-      <Modal
-        title="患者予約"
-        open={isModalVisible}
-        onOk={() => setIsModalVisible(false)}
-        onCancel={() => setIsModalVisible(false)}
-        okText="予約"
-        cancelText="キャンセル"
-      >
-        <Form form={form} layout="vertical">
-          {/* 患者名 */}
-          <Form.Item
-            name="patientName"
-            label="患者名"
-            rules={[{ required: true, message: "患者名を入力してください" }]}
-          >
-            <Select placeholder="患者名" loading={loading}>
-              {patients.map((patient) => (
-                <Option key={patient._id} value={patient.patients_name}>
-                  {patient.patients_name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          {/* 予約日 */}
-          <Form.Item
-            name="date"
-            label="予約日"
-            rules={[{ required: true, message: "予約日を入力してください。" }]}
-          >
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-
-          {/* 予約時間（20分単位で選択） */}
-          <Form.Item
-            name="time"
-            label="予約時間"
-            rules={[
-              { required: true, message: "予約時間を選択してください。" },
-            ]}
-          >
-            <Select placeholder="時間を選択">
-              {generateTimeOptions().map((time) => (
-                <Option key={time} value={time}>
-                  {time}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          {/* 備考 */}
-          <Form.Item name="remarks" label="備考" rules={[{ required: false }]}>
-            <Input placeholder="例：本日のリハビリ内容" />
-          </Form.Item>
-        </Form>
-      </Modal>
+      <PatientReservationModal
+        isModalVisible={isModalVisible}
+        setIsModalVisible={setIsModalVisible}
+        form={form}
+        patients={patients}
+        loading={loading}
+        generateTimeOptions={generateTimeOptions}
+      />
     </SectionWrapper>
   );
 };
 
-export default AchievementList;
+export default ScheduleList;

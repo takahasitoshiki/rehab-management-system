@@ -2,7 +2,7 @@ import React from "react";
 import "./Login.css";
 import LoginIcon from "@/assets/icon/Login.png";
 import { Form, Input, Button, message } from "antd";
-import { login } from "../../services/auth";
+import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/useAuth"; // ✅ useAuth を追加
 

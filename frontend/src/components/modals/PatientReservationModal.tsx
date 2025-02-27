@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { Modal, Form, Input, Select, DatePicker, FormInstance } from "antd";
+import { Modal, Form, Input, Select, DatePicker, FormInstance, message } from "antd";
+import { ReservationRequest, createReservation } from "@/api/fetchReservation"
 import dayjs from "dayjs";
 
 
@@ -27,9 +28,32 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
   patients,
   loading,
   generateTimeOptions,
-  droppedPatient,  // ドロップされた患者情報を受け取る
+  droppedPatient,  
 
 }) => {
+
+  const onSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+
+      const requestData: ReservationRequest = {
+        patient_code: patients.find((p) => p.patients_name === values.patientName)?.patients_code || "",
+        therapist_id: "P15000", // ✅ 
+        date: values.date.format("YYYY-MM-DD"),
+        time: values.time,
+        note: values.remarks || "",
+      };
+
+      await createReservation(requestData); // ✅ 分離したAPI関数を呼び出し
+      message.success("予約が登録されました");
+
+      form.resetFields();
+      setIsModalVisible(false);
+    } catch (error) {
+      console.error(error)
+      message.error("予約の登録に失敗しました");
+    }
+  };
 
   useEffect(() => {
     console.log("✅ モーダルが開いた (isModalVisible):", isModalVisible);
@@ -46,7 +70,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
     <Modal
       title="患者予約"
       open={isModalVisible}
-      onOk={() => setIsModalVisible(false)}
+      onOk={onSubmit}
       onCancel={() => setIsModalVisible(false)}
       okText="予約"
       cancelText="キャンセル"
