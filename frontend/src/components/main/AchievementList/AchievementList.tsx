@@ -19,7 +19,6 @@ type TimeSlot = {
   minute: string;
   patient: string | null;
 };
-
 interface ScheduleListProps {
   selectedDates: [Dayjs, Dayjs];
   onDropPatient: (timeSlotKey: string, patientName: string) => void;
@@ -42,6 +41,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         const data = await fetchPatientsList();
         if (!Array.isArray(data)) throw new Error("データが配列ではありません");
         setPatients(data);
+        setDataSource(generateTimeSlots(data || [])); // ✅ `undefined` の場合、空配列を渡す
       } catch (error) {
         console.error("エラー:", error);
         message.error("患者情報の取得に失敗しました。");
@@ -76,7 +76,9 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     setIsModalVisible(true);
   };
 
+
   const onDropPatient = (timeSlotKey: string, patient: Patient) => {
+
     setDataSource((prevData) =>
       prevData.map((slot) =>
         slot.key === timeSlotKey ? { ...slot, patient: patient.patients_name } : slot

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Table, message } from "antd";
+import React from "react";
+import { Table } from "antd";
 import { scheduleColumns } from "@/constants/scheduleColumns";
 import { fetchTherapistList } from "@/api/fetchTherapist";
 import { useDrop } from "react-dnd";
@@ -36,7 +36,6 @@ interface Reservation {
   time: string;
   patient?: Patient;
   patient_code: string;  // ✅ `patient_code` を追加
-
 }
 
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
@@ -167,13 +166,17 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       }),
     }));
 
-    return {
-      ref: dropRef,
-      style: {
-        backgroundColor: isOver ? "#f0f0f0" : "white",
-      },
-      onDoubleClick: () => handleRowDoubleClick(record),
-    };
+    return (
+      <div
+        ref={dropRef} // ✅ useDrop を適用
+        style={{
+          backgroundColor: isOver ? "#f0f0f0" : "white",
+        }}
+        onDoubleClick={() => handleRowDoubleClick(record)}
+      >
+        {record.patient || ""}
+      </div>
+    );
   };
 
   const modifiedColumns = scheduleColumns.map((column) => ({
@@ -183,6 +186,13 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       ...createDroppableCell(record),
     }),
   }));
+
+  console.log("🛠 therapists の現在の状態:", therapists);
+
+if (!therapists || therapists.length === 0) {
+  console.error("❌ therapists が undefined または 空の配列です！");
+  return <p>セラピスト情報が取得できませんでした。</p>; // `undefined` の場合はエラーメッセージを表示
+}
 
   return (
     <div
@@ -223,9 +233,9 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
         }
 
         return dateList.map((date) =>
-          therapists.map((therapist) => (
+          therapists.map((therapist: Therapist) => (
             <div
-              key={`${therapist.therapist_id}-${date.format("YYYY-MM-DD")}`}
+              key={therapist.therapist_id}
               style={{
                 flexShrink: 0,
                 minWidth: "250px",

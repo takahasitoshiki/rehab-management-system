@@ -3,6 +3,10 @@ import { Modal, Form, Input, Select, DatePicker, FormInstance, message } from "a
 import { ReservationRequest, createReservation } from "@/api/fetchReservation"
 import dayjs from "dayjs";
 
+interface Therapist {
+  therapist_id: string;
+  username: string;
+}
 
 interface Patient {
   patients_code: string;
@@ -16,7 +20,8 @@ interface PatientReservationModalProps {
   patients: Patient[];
   loading: boolean;
   generateTimeOptions: () => string[];
-  droppedPatient?: Patient | null; // ✅ 追加
+  droppedPatient?: Patient | null;
+  selectedTherapist: Therapist | null; // ✅ 追加
 }
 
 const { Option } = Select;
@@ -55,10 +60,11 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
       message.error("予約の登録に失敗しました");
     }
   };
-
   useEffect(() => {
     console.log("✅ モーダルが開いた (isModalVisible):", isModalVisible);
     console.log("✅ droppedPatient:", droppedPatient); // デバッグ出力
+    console.log("✅ therapistId:", selectedTherapist); // ✅ therapistId のデバッグ出力
+
     if (isModalVisible && droppedPatient) {
       form.setFieldsValue({
         patientName: droppedPatient.patients_name,
@@ -66,6 +72,31 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
       });
     }
   }, [isModalVisible, droppedPatient, form]);
+
+  const onSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+
+      const requestData: ReservationRequest = {
+        patient_code:
+          patients.find((p) => p.patients_name === values.patientName)
+            ?.patients_code || "",
+        therapist_id: selectedTherapist ?? { therapist_id: "", username: "" }, // ✅ `null` の場合、デフォルト値を設定
+        date: values.date.format("YYYY-MM-DD"),
+        time: values.time,
+        note: values.remarks || "",
+      };
+
+      await createReservation(requestData); // ✅ 分離したAPI関数を呼び出し
+      message.success("予約が登録されました");
+
+      form.resetFields();
+      setIsModalVisible(false);
+    } catch (error) {
+      console.error(error);
+      message.error("予約の登録に失敗しました");
+    }
+  };
 
   return (
     <Modal
