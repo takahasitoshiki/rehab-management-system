@@ -1,0 +1,7 @@
+node_modules
+
+# 環境変数ファイル
+env
+.env.*
+**/.env
+**/.env.*
