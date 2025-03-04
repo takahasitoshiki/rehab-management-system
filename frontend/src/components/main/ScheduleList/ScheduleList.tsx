@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
-import { generateTimeSlots } from "@/utils/timeSlotGenerator";
+import { generateTimeSlots, TimeSlot } from "@/utils/timeSlotGenerator";
 import dayjs, { Dayjs } from "dayjs";
 import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
 import { fetchPatientsList } from "@/api/fetchPatients";
@@ -14,16 +14,9 @@ export interface Patient {
   classification: string;
 }
 
-type TimeSlot = {
-  key: string;
-  hour: string;
-  minute: string;
-  patient: string | null;
-};
-
 interface ScheduleListProps {
   selectedDates: [Dayjs, Dayjs];
-  onDropPatient: (timeSlotKey: string, patientName: string) => void;
+  onDropPatient: (record: TimeSlot, patientName: string) => void;
   dataSource: TimeSlot[];
   setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>;
 }
@@ -34,7 +27,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState<TimeSlot[]>(generateTimeSlots());
-  const [droppedPatient, setDroppedPatient ] = useState< Patient| null>(null)
+  const [droppedPatient, setDroppedPatient] = useState<Patient | null>(null);
 
   useEffect(() => {
     const loadPatients = async () => {
@@ -65,46 +58,53 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     }
     return times;
   };
-
-  // ダブルクリック時にモーダルを開く
-  const handleRowDoubleClick = (record: TimeSlot) => {
-    // フォームのデフォルト値を設定
+  // ✅ モーダルを開く共通関数
+  const openReservationModal = (record: TimeSlot, patient?: Patient) => {
     form.setFieldsValue({
-      time: `${record.hour}:${record.minute}`, // クリックした行の時間データをセット
-      date: dayjs(), // 予約日を現在の日付に設定
+      time: `${record.hour}:${record.minute}`,
+      date: record.date ? dayjs(record.date) : dayjs(), // ✅ 正しい日付をセット
     });
+
+    console.log("選択された日付:", record.date);
+
+    if (patient) {
+      setDroppedPatient(patient); // ✅ 患者情報がある場合のみセット
+    } else {
+      setDroppedPatient(null); // ✅ クリック時は患者情報なし
+    }
 
     setIsModalVisible(true);
   };
 
-  const onDropPatient = (timeSlotKey: string, patient: Patient) => {
+  // ✅ クリック時の処理
+  const handleRowDoubleClick = (record: TimeSlot) => {
+    console.log("🟢 handleRowDoubleClick 呼び出し - record:", record);
+    openReservationModal(record);
+  };
+
+  // ✅ 患者をドロップした時の処理
+  const onDropPatient = (record: TimeSlot, patient: Patient) => {
+    console.log("🟢 onDropPatient 呼び出し - record:", record);
+    console.log("🟢 onDropPatient 呼び出し - patient:", patient);
     setDataSource((prevData) =>
       prevData.map((slot) =>
-        slot.key === timeSlotKey ? { ...slot, patient: patient.patients_name } : slot
+        slot.key === record.key
+          ? { ...slot, patient: patient.patients_name }
+          : slot
       )
     );
-      const droppedSlot = dataSource.find((slot) => slot.key === timeSlotKey);
-    if (droppedSlot) {
-      form.setFieldsValue({
-        time: `${droppedSlot.hour}:${droppedSlot.minute}`, 
-        date: dayjs(), 
-      });
-    }
-    setDroppedPatient(patient)
-    setIsModalVisible(true);
+
+    openReservationModal(record, patient);
   };
 
   useEffect(() => {
-    if(isModalVisible && droppedPatient){
+    if (isModalVisible && droppedPatient) {
       form.setFieldsValue({
-        patientName:droppedPatient.patients_name,
+        patientName: droppedPatient.patients_name,
         date: dayjs(),
-      })
+      });
     }
-  },[isModalVisible, droppedPatient, form])
-
-  console.log("取得した患者データaaaaa:", JSON.stringify(patients, null, 2));
-
+  }, [isModalVisible, droppedPatient, form]);
 
   return (
     <SectionWrapper>

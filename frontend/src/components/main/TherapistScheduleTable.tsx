@@ -25,7 +25,7 @@ interface TherapistScheduleTableProps {
   dataSource: TimeSlot[];
   handleRowDoubleClick: (record: TimeSlot) => void;
   selectedDates: [Dayjs, Dayjs] | null;
-  onDropPatient: (timeSlotKey: string, patientName: Patient) => void;
+  onDropPatient: (record: TimeSlot, patientName: Patient) => void;
   patients: Patient[]; // ✅ 追加
 }
 
@@ -49,9 +49,6 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   const [therapists, setTherapists] = useState<Therapist[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState<boolean>(!therapists.length);
-
-  console.log("取得した患者データaaaaa:", JSON.stringify(patients, null, 2));
-
 
   useEffect(() => {
     const loadTherapists = async () => {
@@ -82,7 +79,6 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
         if (!Array.isArray(data)) {
           throw new Error("予約データが配列ではありません！");
         }
-        console.log("取得したデータ:", JSON.stringify(data, null, 2));
         setReservations(data);
       } catch (error) {
         console.error("エラー:", error);
@@ -95,11 +91,6 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   }, []);
 
   const getTherapistSchedule = (therapistId: string, date: Dayjs) => {
-    console.log(
-      `📅 ${date.format(
-        "YYYY-MM-DD"
-      )} のセラピストID: ${therapistId} の予約を検索`
-    );
 
     const schedule = dataSource.map((slot) => {
       const reservation = reservations.find((res) => {
@@ -115,40 +106,22 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
         );
       });
 
-      console.log("🔎 予約データ:", reservation);
 
       // 🔥 修正: `patient_code` しかない場合、`patients` から補完
       const patientData = Array.isArray(patients) 
       ? patients.find((p) => p.patients_code === reservation?.patient_code) 
       : undefined;
 
-      console.log("🩺 `patients` の状態:", patients);
-      console.log("🔎 予約データ:", reservation);
-      console.log(
-        "🆔 予約の `patient_code`:",
-        reservation?.patient_code
-      );
-      console.log("🔍 `patients` から検索した患者:", patientData);
-
-      if (!Array.isArray(patients)) {
-        console.error("❌ `patients` が `undefined` または `null` です！");
-      }
-
       const patientName = patientData
         ? patientData.patients_name
         : "";
-
-      console.log(
-        `✅ 予約: ${reservation?.patient_code} → ${patientName}`
-      );
-
       return {
         ...slot,
         patient: patientName,
+        date: date.format("YYYY-MM-DD"), // クリックした行の `date` 情報をセット
       };
     });
 
-    console.log(`✅ セラピスト ${therapistId} の予約一覧`, schedule);
     return schedule;
   };
 
@@ -157,10 +130,8 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     const [{ isOver }, dropRef] = useDrop(() => ({
       accept: "PATIENT",
       drop: (item: { patient?: Patient }) => {
-        console.log("ドロップされたデータ:", item);
         if (!record || !item.patient) return;
-        onDropPatient(record.key, item.patient);
-        console.log("患者名:" + item.patient.patients_name);
+        onDropPatient(record, item.patient);
       },
       collect: (monitor) => ({
         isOver: !!monitor.isOver(),
@@ -207,10 +178,6 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
 
         // ✅ `Dayjs` オブジェクトかチェック
         if (!dayjs.isDayjs(startDate) || !dayjs.isDayjs(endDate)) {
-          console.error(
-            "Error: selectedDates contains invalid Dayjs objects",
-            selectedDates
-          );
           return <p>日付が正しく選択されていません。</p>;
         }
         const dateList = [];

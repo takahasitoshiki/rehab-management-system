@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 import { Modal, Form, Input, Select, DatePicker, FormInstance, message } from "antd";
+import locale from 'antd/es/date-picker/locale/ja_JP';
+import 'dayjs/locale/ja';
 import { ReservationRequest, createReservation } from "@/api/fetchReservation"
 import dayjs from "dayjs";
 
@@ -16,7 +18,7 @@ interface PatientReservationModalProps {
   patients: Patient[];
   loading: boolean;
   generateTimeOptions: () => string[];
-  droppedPatient?: Patient | null; // ✅ 追加
+  droppedPatient?: Patient | null; 
 }
 
 const { Option } = Select;
@@ -35,7 +37,6 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
   const onSubmit = async () => {
     try {
       const values = await form.validateFields();
-
       const requestData: ReservationRequest = {
         patient_code: patients.find((p) => p.patients_name === values.patientName)?.patients_code || "",
         therapist_id: "PT002", // ✅ 
@@ -98,7 +99,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
           label="予約日"
           rules={[{ required: true, message: "予約日を入力してください。" }]}
         >
-          <DatePicker style={{ width: "100%" }} />
+          <DatePicker style={{ width: "100%" }} locale={locale}/>
         </Form.Item>
 
         {/* 予約時間（20分単位で選択） */}

@@ -3,6 +3,7 @@ export interface TimeSlot {
   hour: string;
   minute: string;
   patient: string | null;
+  date?: string; 
 }
 
 export const generateTimeSlots = (): TimeSlot[] => {
@@ -16,7 +17,7 @@ export const generateTimeSlots = (): TimeSlot[] => {
         key: `${hour}-${minute}`,
         hour: hour.toString().padStart(2, "0"),
         minute: minute.toString().padStart(2, "0"),
-        patient: "",
+        patient: null,
       });
     }
   }
