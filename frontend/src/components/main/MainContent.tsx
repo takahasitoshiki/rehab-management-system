@@ -8,7 +8,6 @@ import { Dayjs } from "dayjs";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-
 interface MainContentProps {
   visibleSections: {
     patients: boolean;
@@ -96,7 +95,7 @@ const MainContent: React.FC<MainContentProps> = ({
         {visibleSections.achievements && (
           <div style={{ ...getSectionStyle("achievements"), flex: 4, overflowX: "hidden", minWidth: "500px" }}>
             <MainHeader title="実績一覧" onClose={() => handleClose("achievements")} onMaximize={() => handleMaximize("achievements")} />
-            <AchievementList selectedDates={selectedDates} />
+            <AchievementList selectedDates={selectedDates} /> 
           </div>
         )}
       </div>
