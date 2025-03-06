@@ -4,6 +4,7 @@ export interface TimeSlot {
   minute: string;
   patient: string | null;
   date?: string; 
+  therapist_id:string| null;
 }
 
 export const generateTimeSlots = (): TimeSlot[] => {
@@ -18,6 +19,7 @@ export const generateTimeSlots = (): TimeSlot[] => {
         hour: hour.toString().padStart(2, "0"),
         minute: minute.toString().padStart(2, "0"),
         patient: null,
+        therapist_id:"",
       });
     }
   }

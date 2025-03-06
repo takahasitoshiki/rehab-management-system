@@ -2,7 +2,7 @@ const VITE_APP_RESERVATION_URL = import.meta.env.VITE_APP_RESERVATION_URL
 
 export interface ReservationRequest {
     patient_code: string;
-    therapist_id: string;
+    therapist_id: string | null;
     date: string;
     time: string;
     note?: string;

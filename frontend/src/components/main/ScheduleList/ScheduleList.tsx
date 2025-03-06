@@ -60,9 +60,15 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   };
   // ✅ モーダルを開く共通関数
   const openReservationModal = (record: TimeSlot, patient?: Patient) => {
+
+    console.log("🟢 openReservationModal - record:", record);
+    console.log("🟢 openReservationModal - record.therapist_id:", record.therapist_id);
+  
+
     form.setFieldsValue({
       time: `${record.hour}:${record.minute}`,
       date: record.date ? dayjs(record.date) : dayjs(), // ✅ 正しい日付をセット
+      therapist_id: record.therapist_id, // ✅ therapist_id をセット
     });
 
     console.log("選択された日付:", record.date);
@@ -86,10 +92,18 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const onDropPatient = (record: TimeSlot, patient: Patient) => {
     console.log("🟢 onDropPatient 呼び出し - record:", record);
     console.log("🟢 onDropPatient 呼び出し - patient:", patient);
+    console.log("🟢 onDropPatient - record.therapist_id:", record.therapist_id);
+
     setDataSource((prevData) =>
       prevData.map((slot) =>
         slot.key === record.key
-          ? { ...slot, patient: patient.patients_name }
+          ? { 
+            ...slot, 
+            patient: patient.patients_name,
+            date: record.date ?? dayjs().format("YYYY-MM-DD"), // ✅ `date` をセット
+            therapist_id: slot.therapist_id || record.therapist_id || null, // ✅ therapist_id を維持
+
+          }
           : slot
       )
     );
@@ -99,12 +113,21 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
 
   useEffect(() => {
     if (isModalVisible && droppedPatient) {
+      // dataSource からドロップされた患者のデータを取得
+      const droppedSlot = dataSource.find((slot) => slot.patient === droppedPatient.patients_name);
+  
+      console.log("🟢 モーダルでセットする日付:", droppedSlot?.date);
+      console.log("🟢 useEffect - droppedSlot:", droppedSlot);
+      console.log("🟢 useEffect - droppedSlot?.therapist_id:", droppedSlot?.therapist_id);
+  
       form.setFieldsValue({
         patientName: droppedPatient.patients_name,
-        date: dayjs(),
+        date: droppedSlot?.date ? dayjs(droppedSlot.date) : dayjs(), // ✅ `date` を正しくセット
+        therapist_id: droppedSlot?.therapist_id || null, // ✅ therapist_id をセット
+
       });
     }
-  }, [isModalVisible, droppedPatient, form]);
+  }, [isModalVisible, droppedPatient, dataSource, form]);
 
   return (
     <SectionWrapper>

@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Table, message } from "antd";
 import { scheduleColumns } from "@/constants/scheduleColumns";
-import { fetchTherapistList } from "@/api/fetchTherapist";
+import { TimeSlot } from "@/utils/timeSlotGenerator";
+import { fetchTherapists } from "@/store/slices/therapistSlice";
 import { useDrop } from "react-dnd";
+import { RootState, AppDispatch } from "@/store";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import { TimeSlot } from "@/utils/timeSlotGenerator";
 
 dayjs.extend(isBetween);
-
-interface Therapist {
-  therapist_id: string;
-  username: string;
-}
 
 interface Patient {
   _id: string;
@@ -35,8 +32,7 @@ interface Reservation {
   date: string;
   time: string;
   patient?: Patient;
-  patient_code: string;  // ✅ `patient_code` を追加
-
+  patient_code: string; // ✅ `patient_code` を追加
 }
 
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
@@ -46,27 +42,16 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   onDropPatient,
   patients,
 }) => {
-  const [therapists, setTherapists] = useState<Therapist[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [loading, setLoading] = useState<boolean>(!therapists.length);
+  const [loading, setLoading] = useState<boolean>();
+  const therapists = useSelector(
+    (state: RootState) => state.therapists.therapists
+  );
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    const loadTherapists = async () => {
-      try {
-        const therapistData = await fetchTherapistList();
-        if (!Array.isArray(therapistData)) {
-          throw new Error("取得したデータが配列ではありません！");
-        }
-        setTherapists(therapistData);
-      } catch (error) {
-        console.error("エラー内容:", error);
-        message.error("セラピスト情報の取得に失敗しました。");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadTherapists();
-  }, []);
+    dispatch(fetchTherapists());
+  }, [dispatch]);
 
   // ✅ 予約データを取得
   useEffect(() => {
@@ -91,7 +76,6 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   }, []);
 
   const getTherapistSchedule = (therapistId: string, date: Dayjs) => {
-
     const schedule = dataSource.map((slot) => {
       const reservation = reservations.find((res) => {
         const resTherapistId = res.therapist_id.trim().toUpperCase();
@@ -106,19 +90,17 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
         );
       });
 
-
       // 🔥 修正: `patient_code` しかない場合、`patients` から補完
-      const patientData = Array.isArray(patients) 
-      ? patients.find((p) => p.patients_code === reservation?.patient_code) 
-      : undefined;
+      const patientData = Array.isArray(patients)
+        ? patients.find((p) => p.patients_code === reservation?.patient_code)
+        : undefined;
 
-      const patientName = patientData
-        ? patientData.patients_name
-        : "";
+      const patientName = patientData ? patientData.patients_name : "";
       return {
         ...slot,
+        therapist_id: therapistId, // ✅ therapist_id をセット
         patient: patientName,
-        date: date.format("YYYY-MM-DD"), // クリックした行の `date` 情報をセット
+        date: date.format("YYYY-MM-DD"),
       };
     });
 
@@ -151,7 +133,11 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     ...column,
     onCell: (record: TimeSlot, index?: number) => ({
       ...(column.onCell ? column.onCell(record, index ?? 0) : {}),
-      ...createDroppableCell(record),
+      ...createDroppableCell({
+        ...record,
+        therapist_id: record.therapist_id, // ✅ 追加
+        patient: record.patient ?? "", // ✅ `null` の場合は `""` に変換
+      }),
     }),
   }));
 
@@ -205,7 +191,7 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
                 title={() =>
                   `${therapist.username} (${date.format("YYYY-MM-DD")})`
                 }
-                dataSource={getTherapistSchedule(therapist.therapist_id, date)}
+                dataSource={getTherapistSchedule(therapist.therapist_id, date)} // ✅ 修正済み
                 loading={loading}
                 pagination={false}
                 bordered
