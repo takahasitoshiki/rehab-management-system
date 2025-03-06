@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
-import { generateTimeSlots } from "@/utils/timeSlotGenerator";
+import { generateTimeSlots, TimeSlot } from "@/utils/timeSlotGenerator";
 import dayjs, { Dayjs } from "dayjs";
 import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
 import { fetchPatientsList } from "@/api/fetchPatients";
@@ -13,12 +13,6 @@ interface Patient {
   classification: string;
 }
 
-type TimeSlot = {
-  key: string;
-  hour: string;
-  minute: string;
-  patient: string | null;
-};
 interface ScheduleListProps {
   selectedDates: [Dayjs, Dayjs];
   onDropPatient: (timeSlotKey: string, patientName: string) => void;

@@ -1,12 +1,21 @@
-import React, { useEffect } from "react";
-import { Modal, Form, Input, Select, DatePicker, FormInstance, message } from "antd";
-import { ReservationRequest, createReservation } from "@/api/fetchReservation"
-import dayjs from "dayjs";
+import React from "react";
+import {
+  Modal,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  FormInstance,
+  message,
+} from "antd";
+import locale from "antd/es/date-picker/locale/ja_JP";
+import "dayjs/locale/ja";
+import { ReservationRequest, createReservation } from "@/api/fetchReservation";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/store";
+import { fetchTherapists } from "@/store/slices/therapistSlice";
+import { useEffect } from "react";
 
-interface Therapist {
-  therapist_id: string;
-  username: string;
-}
 
 interface Patient {
   patients_code: string;
@@ -21,7 +30,6 @@ interface PatientReservationModalProps {
   loading: boolean;
   generateTimeOptions: () => string[];
   droppedPatient?: Patient | null;
-  selectedTherapist: Therapist | null; // ✅ 追加
 }
 
 const { Option } = Select;
@@ -33,65 +41,38 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
   patients,
   loading,
   generateTimeOptions,
-  droppedPatient,  
-
 }) => {
-
-  const onSubmit = async () => {
-    try {
-      const values = await form.validateFields();
-
-      const requestData: ReservationRequest = {
-        patient_code: patients.find((p) => p.patients_name === values.patientName)?.patients_code || "",
-        therapist_id: "PT002", // ✅ 
-        date: values.date.format("YYYY-MM-DD"),
-        time: values.time,
-        note: values.remarks || "",
-      };
-
-      await createReservation(requestData); // ✅ 分離したAPI関数を呼び出し
-      message.success("予約が登録されました");
-
-      form.resetFields();
-      setIsModalVisible(false);
-      window.location.reload() 
-    } catch (error) {
-      console.error(error)
-      message.error("予約の登録に失敗しました");
-    }
-  };
+  const dispatch = useDispatch<AppDispatch>();
+  const therapists = useSelector(
+    (state: RootState) => state.therapists.therapists
+  );
+  // セラピスト一覧を取得
   useEffect(() => {
-    console.log("✅ モーダルが開いた (isModalVisible):", isModalVisible);
-    console.log("✅ droppedPatient:", droppedPatient); // デバッグ出力
-    console.log("✅ therapistId:", selectedTherapist); // ✅ therapistId のデバッグ出力
-
-    if (isModalVisible && droppedPatient) {
-      form.setFieldsValue({
-        patientName: droppedPatient.patients_name,
-        date: dayjs(), // ✅ 日付セット
-      });
+    if (therapists.length === 0) {
+      dispatch(fetchTherapists());
     }
-  }, [isModalVisible, droppedPatient, form]);
+  }, [dispatch, therapists.length]);
 
   const onSubmit = async () => {
     try {
       const values = await form.validateFields();
-
       const requestData: ReservationRequest = {
         patient_code:
           patients.find((p) => p.patients_name === values.patientName)
             ?.patients_code || "",
-        therapist_id: selectedTherapist ?? { therapist_id: "", username: "" }, // ✅ `null` の場合、デフォルト値を設定
+        therapist_id: values.therapist_id || null, // ✅ form から取得
         date: values.date.format("YYYY-MM-DD"),
         time: values.time,
         note: values.remarks || "",
       };
 
+      console.log("選択したセラピスト:" + therapists[0].therapist_id);
       await createReservation(requestData); // ✅ 分離したAPI関数を呼び出し
       message.success("予約が登録されました");
 
       form.resetFields();
       setIsModalVisible(false);
+      // window.location.reload();
     } catch (error) {
       console.error(error);
       message.error("予約の登録に失敗しました");
@@ -109,6 +90,25 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
     >
       <Form form={form} layout="vertical">
         {/* 患者名 */}
+        {/* セラピスト */}
+        <Form.Item
+          name="therapist_id"
+          label="セラピスト"
+          rules={[
+            { required: true, message: "セラピストを選択してください。" },
+          ]}
+        >
+          <Select placeholder="セラピストを選択">
+            {therapists.map((therapist) => (
+              <Option
+                key={therapist.therapist_id}
+                value={therapist.therapist_id}
+              >
+                {therapist.username} {/* ここは適切な名前プロパティに変更 */}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
         <Form.Item
           name="patientName"
           label="患者名"
@@ -129,7 +129,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
           label="予約日"
           rules={[{ required: true, message: "予約日を入力してください。" }]}
         >
-          <DatePicker style={{ width: "100%" }} />
+          <DatePicker style={{ width: "100%" }} locale={locale} />
         </Form.Item>
 
         {/* 予約時間（20分単位で選択） */}
