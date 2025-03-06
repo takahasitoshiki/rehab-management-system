@@ -116,10 +116,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
       // dataSource からドロップされた患者のデータを取得
       const droppedSlot = dataSource.find((slot) => slot.patient === droppedPatient.patients_name);
   
-      console.log("🟢 モーダルでセットする日付:", droppedSlot?.date);
-      console.log("🟢 useEffect - droppedSlot:", droppedSlot);
-      console.log("🟢 useEffect - droppedSlot?.therapist_id:", droppedSlot?.therapist_id);
-  
       form.setFieldsValue({
         patientName: droppedPatient.patients_name,
         date: droppedSlot?.date ? dayjs(droppedSlot.date) : dayjs(), // ✅ `date` を正しくセット
