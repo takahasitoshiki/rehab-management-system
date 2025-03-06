@@ -11,10 +11,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  // useCallback
   const login = () => {
     setIsAuthenticated(true);
   };
 
+  // ussCallback
   const logout = () => {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
