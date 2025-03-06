@@ -1,8 +1,6 @@
 import axios from "axios";
 
 const VITE_API_THERAPIST_URL = import.meta.env.VITE_API_THERAPIST_URL;
-
-console.log("🟢 APIのURL:", VITE_API_THERAPIST_URL);
 export interface Therapist {
   therapist_id: string;
   username: string;

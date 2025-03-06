@@ -105,8 +105,11 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       };
     });
 
+    console.log("取得したカラム:", JSON.stringify(schedule, null, 2));
     return schedule;
   };
+
+
 
   // ✅ 各セルに `useDrop` を適用
   const createDroppableCell = (record: TimeSlot) => {
@@ -141,6 +144,9 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       }),
     }),
   }));
+
+
+  console.log("取得したカラム:", JSON.stringify(modifiedColumns, null, 2));
 
   return (
     <div

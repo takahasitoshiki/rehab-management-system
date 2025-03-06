@@ -60,19 +60,11 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   };
   // ✅ モーダルを開く共通関数
   const openReservationModal = (record: TimeSlot, patient?: Patient) => {
-
-    console.log("🟢 openReservationModal - record:", record);
-    console.log("🟢 openReservationModal - record.therapist_id:", record.therapist_id);
-  
-
     form.setFieldsValue({
       time: `${record.hour}:${record.minute}`,
       date: record.date ? dayjs(record.date) : dayjs(), // ✅ 正しい日付をセット
       therapist_id: record.therapist_id, // ✅ therapist_id をセット
     });
-
-    console.log("選択された日付:", record.date);
-
     if (patient) {
       setDroppedPatient(patient); // ✅ 患者情報がある場合のみセット
     } else {
@@ -84,7 +76,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
 
   // ✅ クリック時の処理
   const handleRowDoubleClick = (record: TimeSlot) => {
-    console.log("🟢 handleRowDoubleClick 呼び出し - record:", record);
     openReservationModal(record);
   };
 
@@ -120,7 +111,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         patientName: droppedPatient.patients_name,
         date: droppedSlot?.date ? dayjs(droppedSlot.date) : dayjs(), // ✅ `date` を正しくセット
         therapist_id: droppedSlot?.therapist_id || null, // ✅ therapist_id をセット
-
       });
     }
   }, [isModalVisible, droppedPatient, dataSource, form]);
