@@ -1,23 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Table, message } from "antd";
-import { scheduleColumns } from "@/constants/scheduleColumns";
-import { TimeSlot } from "@/utils/timeSlotGenerator";
 import { fetchTherapists } from "@/store/slices/therapistSlice";
-import { useDrop } from "react-dnd";
-import { Therapist } from "@/types/therapists";
+import { getReservations, selectReservations, selectReservationsLoading } from "@/store/slices/reservationSlice";
 import { RootState, AppDispatch } from "@/store";
+import { useDrop } from "react-dnd";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import { Table } from "antd";
+import { scheduleColumns } from "@/constants/scheduleColumns";
+import { TimeSlot } from "@/utils/timeSlotGenerator";
+import { Therapist } from "@/types/therapists";
+import { Patient } from "@/types/Patient";
 
 dayjs.extend(isBetween);
-
-interface Patient {
-  _id: string;
-  patients_code: string;
-  patients_name: string;
-  classification: string;
-}
 
 interface TherapistScheduleTableProps {
   dataSource: TimeSlot[];
@@ -27,15 +22,6 @@ interface TherapistScheduleTableProps {
   patients: Patient[]; // ✅ 追加
 }
 
-interface Reservation {
-  reservation_id: string;
-  therapist_id: string;
-  date: string;
-  time: string;
-  patient?: Patient;
-  patient_code: string; // ✅ `patient_code` を追加
-}
-
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   dataSource,
   handleRowDoubleClick,
@@ -43,8 +29,8 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   onDropPatient,
   patients,
 }) => {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [loading, setLoading] = useState<boolean>();
+  const reservations = useSelector(selectReservations); 
+  const loading = useSelector(selectReservationsLoading); 
   const therapists = useSelector(
     (state: RootState) => state.therapists.therapists
   );
@@ -52,29 +38,9 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
 
   useEffect(() => {
     dispatch(fetchTherapists());
+    dispatch(getReservations()); // ✅ Redux で予約データ取得
   }, [dispatch]);
 
-  // ✅ 予約データを取得
-  useEffect(() => {
-    const fetchReservations = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:8000/api/reservation/search"
-        );
-        const data = await response.json();
-        if (!Array.isArray(data)) {
-          throw new Error("予約データが配列ではありません！");
-        }
-        setReservations(data);
-      } catch (error) {
-        console.error("エラー:", error);
-        message.error("予約データの取得に失敗しました。");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchReservations();
-  }, []);
 
   const getTherapistSchedule = (therapistId: string, date: Dayjs) => {
     const schedule = dataSource.map((slot) => {
@@ -105,7 +71,6 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       };
     });
 
-    console.log("取得したカラム:", JSON.stringify(schedule, null, 2));
     return schedule;
   };
 
@@ -133,20 +98,20 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     };
   };
 
+
   const modifiedColumns = scheduleColumns.map((column) => ({
     ...column,
     onCell: (record: TimeSlot, index?: number) => ({
       ...(column.onCell ? column.onCell(record, index ?? 0) : {}),
-      ...createDroppableCell({
-        ...record,
-        therapist_id: record.therapist_id, // ✅ 追加
-        patient: record.patient ?? "", // ✅ `null` の場合は `""` に変換
-      }),
+      ...createDroppableCell(record),
     }),
   }));
 
+  
+  const onRowClick = (record: TimeSlot) => ({
+    onDoubleClick: () => handleRowDoubleClick(record),
+  });
 
-  console.log("取得したカラム:", JSON.stringify(modifiedColumns, null, 2));
 
   return (
     <div
@@ -204,6 +169,7 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
                 bordered
                 size="small"
                 style={{ tableLayout: "fixed", minWidth: "250px" }}
+                onRow={onRowClick} // ✅ 追加
               />
             </div>
           ))

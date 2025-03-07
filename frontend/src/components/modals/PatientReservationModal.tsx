@@ -10,7 +10,7 @@ import {
 } from "antd";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "dayjs/locale/ja";
-import { ReservationRequest, createReservation } from "@/api/fetchReservation";
+import { Reservation, createReservation } from "@/api/fetchReservation";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { fetchTherapists } from "@/store/slices/therapistSlice";
@@ -56,7 +56,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
   const onSubmit = async () => {
     try {
       const values = await form.validateFields();
-      const requestData: ReservationRequest = {
+      const requestData: Reservation = {
         patient_code:
           patients.find((p) => p.patients_name === values.patientName)
             ?.patients_code || "",
@@ -72,7 +72,6 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
 
       form.resetFields();
       setIsModalVisible(false);
-      // window.location.reload();
     } catch (error) {
       console.error(error);
       message.error("予約の登録に失敗しました");

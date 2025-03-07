@@ -93,7 +93,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
             patient: patient.patients_name,
             date: record.date ?? dayjs().format("YYYY-MM-DD"), // ✅ `date` をセット
             therapist_id: slot.therapist_id || record.therapist_id || null, // ✅ therapist_id を維持
-
           }
           : slot
       )
