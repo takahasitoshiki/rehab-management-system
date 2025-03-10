@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTherapists } from "@/store/slices/therapistSlice";
-import { getReservations, selectReservations, selectReservationsLoading } from "@/store/slices/reservationSlice";
+import {
+  getReservations,
+  selectReservations,
+  selectReservationsLoading,
+} from "@/store/slices/reservationSlice";
 import { RootState, AppDispatch } from "@/store";
 import { useDrop } from "react-dnd";
 import dayjs, { Dayjs } from "dayjs";
@@ -29,8 +33,8 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   onDropPatient,
   patients,
 }) => {
-  const reservations = useSelector(selectReservations); 
-  const loading = useSelector(selectReservationsLoading); 
+  const reservations = useSelector(selectReservations);
+  const loading = useSelector(selectReservationsLoading);
   const therapists = useSelector(
     (state: RootState) => state.therapists.therapists
   );
@@ -41,10 +45,9 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     dispatch(getReservations()); // ✅ Redux で予約データ取得
   }, [dispatch]);
 
-
   const getTherapistSchedule = (therapistId: string, date: Dayjs) => {
     const schedule = dataSource.map((slot) => {
-      const reservation = reservations.find((res) => {
+      const matchingReservations = reservations.filter((res) => {
         const resTherapistId = res.therapist_id.trim().toUpperCase();
         const resDate = dayjs(res.date).format("YYYY-MM-DD");
         const resTime = res.time.padStart(5, "0");
@@ -57,24 +60,32 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
         );
       });
 
-      // 🔥 修正: `patient_code` しかない場合、`patients` から補完
-      const patientData = Array.isArray(patients)
-        ? patients.find((p) => p.patients_code === reservation?.patient_code)
-        : undefined;
+      const patientNames =
+        Array.isArray(patients) && matchingReservations.length > 0
+          ? matchingReservations
+              .map((reservation) => {
+                const patientData = patients.find(
+                  (p) => p.patients_code === reservation.patient_code
+                );
+                return patientData ? patientData.patients_name : "";
+              })
+              .filter((name) => name !== "") // 空文字列を取り除く
+              .join(", ") // 名前をカンマ区切りで結合
+          : "";
 
-      const patientName = patientData ? patientData.patients_name : "";
+      const patientName = patientNames || "";
       return {
         ...slot,
         therapist_id: therapistId, // ✅ therapist_id をセット
         patient: patientName,
         date: date.format("YYYY-MM-DD"),
+        reservations: matchingReservations, // 該当する予約の配列を格納
       };
     });
 
+    console.log(JSON.stringify(schedule, null, 2));
     return schedule;
   };
-
-
 
   // ✅ 各セルに `useDrop` を適用
   const createDroppableCell = (record: TimeSlot) => {
@@ -98,7 +109,6 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     };
   };
 
-
   const modifiedColumns = scheduleColumns.map((column) => ({
     ...column,
     onCell: (record: TimeSlot, index?: number) => ({
@@ -107,11 +117,11 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
     }),
   }));
 
-  
   const onRowClick = (record: TimeSlot) => ({
-    onDoubleClick: () => handleRowDoubleClick(record),
+    onDoubleClick: () => {
+      handleRowDoubleClick(record);
+    },
   });
-
 
   return (
     <div
@@ -163,7 +173,7 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
                 title={() =>
                   `${therapist.username} (${date.format("YYYY-MM-DD")})`
                 }
-                dataSource={getTherapistSchedule(therapist.therapist_id, date)} // ✅ 修正済み
+                dataSource={getTherapistSchedule(therapist.therapist_id, date)}
                 loading={loading}
                 pagination={false}
                 bordered

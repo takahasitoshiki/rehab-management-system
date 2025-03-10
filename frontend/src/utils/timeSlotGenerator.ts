@@ -1,4 +1,7 @@
 
+import { Reservation } from "@/api/fetchReservation"; 
+
+
 export interface TimeSlot {
   key: string;
   hour: string;
@@ -6,6 +9,7 @@ export interface TimeSlot {
   patient: string | null;
   date?: string; 
   therapist_id:string| null;
+  reservations?: Reservation[]; // 配列を追加
 }
 
 export const generateTimeSlots = (): TimeSlot[] => {

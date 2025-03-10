@@ -6,17 +6,13 @@ import dayjs, { Dayjs } from "dayjs";
 import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
 import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
+import { Patient } from "@/api/fetchPatients"
+import { Reservation } from "@/api/fetchReservation"
 
-export interface Patient {
-  _id: string;
-  patients_code: string;
-  patients_name: string;
-  classification: string;
-}
 
 interface ScheduleListProps {
   selectedDates: [Dayjs, Dayjs];
-  onDropPatient: (record: TimeSlot, patientName: string) => void;
+  onDropPatient: (record: TimeSlot, patient: Patient, updatedReservations: Reservation[]) => void; // ✅ 修正
   dataSource: TimeSlot[];
   setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>;
 }
@@ -76,6 +72,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
 
   // ✅ クリック時の処理
   const handleRowDoubleClick = (record: TimeSlot) => {
+    console.log("ダブルクリックされました")
     openReservationModal(record);
   };
 

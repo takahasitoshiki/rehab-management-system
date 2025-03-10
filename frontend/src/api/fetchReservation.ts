@@ -1,5 +1,5 @@
 const VITE_APP_RESERVATION_URL = import.meta.env.VITE_APP_RESERVATION_URL
-import { Patient } from "@/types/Patient";
+import { Patient } from "@/api/fetchPatients";
 
 
 export interface Reservation {
