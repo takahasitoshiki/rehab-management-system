@@ -10,6 +10,7 @@ export interface TimeSlot {
   date?: string; 
   therapist_id:string| null;
   reservations?: Reservation[]; // 配列を追加
+  rowSpan?: number; // ✅ 追加
 }
 
 export const generateTimeSlots = (): TimeSlot[] => {

@@ -42,48 +42,49 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
 
   useEffect(() => {
     dispatch(fetchTherapists());
-    dispatch(getReservations()); // ✅ Redux で予約データ取得
+    dispatch(getReservations());
   }, [dispatch]);
 
   const getTherapistSchedule = (therapistId: string, date: Dayjs) => {
-    const schedule = dataSource.map((slot) => {
+    const schedule: TimeSlot[] = [];
+  
+    dataSource.forEach((slot) => {
       const matchingReservations = reservations.filter((res) => {
-        const resTherapistId = res.therapist_id.trim().toUpperCase();
-        const resDate = dayjs(res.date).format("YYYY-MM-DD");
-        const resTime = res.time.padStart(5, "0");
-
         return (
-          resTherapistId === therapistId.trim().toUpperCase() &&
-          resDate === date.format("YYYY-MM-DD") &&
-          resTime ===
-            `${slot.hour.padStart(2, "0")}:${slot.minute.padStart(2, "0")}`
+          res.therapist_id.trim().toUpperCase() === therapistId.trim().toUpperCase() &&
+          dayjs(res.date).format("YYYY-MM-DD") === date.format("YYYY-MM-DD") &&
+          res.time.padStart(5, "0") === `${slot.hour.padStart(2, "0")}:${slot.minute.padStart(2, "0")}`
         );
       });
-
-      const patientNames =
-        Array.isArray(patients) && matchingReservations.length > 0
-          ? matchingReservations
-              .map((reservation) => {
-                const patientData = patients.find(
-                  (p) => p.patients_code === reservation.patient_code
-                );
-                return patientData ? patientData.patients_name : "";
-              })
-              .filter((name) => name !== "") // 空文字列を取り除く
-              .join(", ") // 名前をカンマ区切りで結合
-          : "";
-
-      const patientName = patientNames || "";
-      return {
-        ...slot,
-        therapist_id: therapistId, // ✅ therapist_id をセット
-        patient: patientName,
-        date: date.format("YYYY-MM-DD"),
-        reservations: matchingReservations, // 該当する予約の配列を格納
-      };
+      
+      if (matchingReservations.length > 0) {
+        // 予約の数だけ `TimeSlot` を追加
+        matchingReservations.forEach((reservation, index) => {
+          const patientData = (patients || []).find((p) => p.patients_code === reservation.patient_code);
+          schedule.push({
+            key: `${slot.hour}-${slot.minute}-${index}`, // 各予約にユニークなキーを付ける
+            hour: slot.hour,
+            minute: slot.minute,
+            patient: patientData ? patientData.patients_name : "",
+            therapist_id: therapistId,
+            date: date.format("YYYY-MM-DD"),
+            reservations: [reservation], // 予約1件ごとのレコードにする
+          });
+        });
+      } else {
+        // 予約がない場合でもスケジュールを追加
+        schedule.push({
+          key: `${slot.hour}-${slot.minute}-empty`,
+          hour: slot.hour,
+          minute: slot.minute,
+          patient: "",
+          therapist_id: therapistId,
+          date: date.format("YYYY-MM-DD"),
+          reservations: [],
+        });
+      }
     });
-
-    console.log(JSON.stringify(schedule, null, 2));
+  
     return schedule;
   };
 
@@ -179,7 +180,7 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
                 bordered
                 size="small"
                 style={{ tableLayout: "fixed", minWidth: "250px" }}
-                onRow={onRowClick} // ✅ 追加
+                onRow={onRowClick}
               />
             </div>
           ))
