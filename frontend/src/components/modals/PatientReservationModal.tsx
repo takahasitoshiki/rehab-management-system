@@ -16,7 +16,6 @@ import { RootState, AppDispatch } from "@/store";
 import { fetchTherapists } from "@/store/slices/therapistSlice";
 import { useEffect } from "react";
 
-
 interface Patient {
   patients_code: string;
   patients_name: string;
@@ -46,6 +45,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
   const therapists = useSelector(
     (state: RootState) => state.therapists.therapists
   );
+  
   // セラピスト一覧を取得
   useEffect(() => {
     if (therapists.length === 0) {
@@ -60,7 +60,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
         patient_code:
           patients.find((p) => p.patients_name === values.patientName)
             ?.patients_code || "",
-        therapist_id: values.therapist_id || null, // ✅ form から取得
+        therapist_id: values.therapist_id, // ✅ form から取得
         date: values.date.format("YYYY-MM-DD"),
         time: values.time,
         note: values.remarks || "",
@@ -88,7 +88,6 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
       cancelText="キャンセル"
     >
       <Form form={form} layout="vertical">
-        {/* 患者名 */}
         {/* セラピスト */}
         <Form.Item
           name="therapist_id"
@@ -108,6 +107,8 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
             ))}
           </Select>
         </Form.Item>
+
+        {/* 患者名 */}
         <Form.Item
           name="patientName"
           label="患者名"
