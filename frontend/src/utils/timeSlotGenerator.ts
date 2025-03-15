@@ -1,7 +1,6 @@
 
 import { Reservation } from "@/api/fetchReservation"; 
 
-
 export interface TimeSlot {
   key: string;
   hour: string;
