@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { fetchTherapists } from "@/store/slices/therapistSlice";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getReservations,
   selectReservations,
   selectReservationsLoading,
 } from "@/store/slices/reservationSlice";
+
+import {selectSelectedDates} from "@/store/slices/dateSlice";
 import { RootState, AppDispatch } from "@/store";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
@@ -28,10 +30,11 @@ interface TherapistScheduleTableProps {
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   dataSource,
   handleRowDoubleClick,
-  selectedDates,
+  // selectedDates,
   onDropPatient,
   patients,
 }) => {
+  const selectedDates = useSelector(selectSelectedDates); // ✅ Redux から selectedDates を取得
   const reservations = useSelector(selectReservations);
   const loading = useSelector(selectReservationsLoading);
   const therapists = useSelector(
@@ -89,17 +92,17 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
 
       if (matchingReservations.length > 0) {
         matchingReservations.forEach((reservation, idx) => {
-          const patient = patients?.find(
-            (p) => p.patients_code === reservation.patient_code
-          );
-          schedule.push({
-            ...slot,
-            key: `${slot.hour}-${slot.minute}-${idx}`,
-            patient: patient?.patients_name || "",
-            therapist_id: therapistId,
-            date: date.format("YYYY-MM-DD"),
-            reservations: [reservation],
-          });
+            const patient = patients?.find(
+              (p) => p.patients_code === reservation.patient_code
+            );
+            schedule.push({
+              ...slot,
+              key: `${slot.hour}-${slot.minute}-${idx}`,
+              patient: patient?.patients_name || "",
+              therapist_id: therapistId,
+              date: date.format("YYYY-MM-DD"),
+              reservations: [reservation],
+            });
         });
       } else {
         schedule.push({
@@ -117,39 +120,40 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   };
 
   const columns = createScheduleColumns(onDropPatient);
-
   return (
     <div style={{ display: "flex", overflowX: "auto" }}>
-{selectedDates &&
-  therapists &&
-  therapists.length > 0 &&
-  selectedDates.map((date) =>
-    therapists.map((therapist: Therapist) => (
-      <div
-        key={`${therapist.therapist_id}-${date.format("YYYY-MM-DD")}`}
-        style={{
-          flexShrink: 0,
-          minWidth: "250px",
-          display: "inline-block",
-        }}
-      >
-        <Table<TimeSlot>
-          className="custom-table"
-          columns={columns}
-          title={() => `${therapist.username} (${date.format("YYYY-MM-DD")})`}
-          dataSource={getTherapistSchedule(therapist.therapist_id, date)}
-          loading={loading}
-          pagination={false}
-          bordered
-          size="small"
-          onRow={(record) => ({
-            onDoubleClick: () => handleRowDoubleClick(record),
-          })}
-          style={{ tableLayout: "fixed", minWidth: "250px" }}
-        />
-      </div>
-    ))
-  )}
+      {selectedDates &&
+        therapists &&
+        therapists.length > 0 &&
+        selectedDates.map((date: Dayjs) =>
+          therapists.map((therapist: Therapist) => (
+            <div
+              key={`${therapist.therapist_id}-${date.format("YYYY-MM-DD")}`}
+              style={{
+                flexShrink: 0,
+                minWidth: "250px",
+                display: "inline-block",
+              }}
+            >
+              <Table<TimeSlot>
+                className="custom-table"
+                columns={columns}
+                title={() =>
+                  `${therapist.username} (${date.format("YYYY-MM-DD")})`
+                }
+                dataSource={getTherapistSchedule(therapist.therapist_id, date)}
+                loading={loading}
+                pagination={false}
+                bordered
+                size="small"
+                onRow={(record) => ({
+                  onDoubleClick: () => handleRowDoubleClick(record),
+                })}
+                style={{ tableLayout: "fixed", minWidth: "250px" }}
+              />
+            </div>
+          ))
+        )}
     </div>
   );
 };

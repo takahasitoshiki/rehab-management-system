@@ -11,14 +11,10 @@ import {
 } from "@/assets/icon";
 import "../../pages/Main/CustomHeader.css";
 import { DatePicker, Modal } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { setDateRange, selectDateRange } from "@/store/slices/dateSlice";
 import PatientRegistrationContent from "../../components/main/headerBtnComponent/PatientRegistrationContent";
-// import PatientListContent from "../../components/main/headerBtnComponent/PatientListContent";
-// import TherapistContent from "../../components/main/headerBtnComponent/TherapistContent";
-// import ReservationListContent from "../../components/main/headerBtnComponent/ReservationListContent";
-// import AchievementsContent from "../../components/main/headerBtnComponent/AchievementsContent";
-// import SyncContent from "../../components/main/headerBtnComponent/SyncContent";
-// import ResetContent from "../../components/main/headerBtnComponent/ResetContent";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 
 type ButtonData = {
   iconSrc: string;
@@ -26,9 +22,6 @@ type ButtonData = {
   modalContent?: React.ReactNode;
   sectionKey?: "patients" | "schedules" | "achievements"; // sectionKeyがある場合
 };
-
-const getStartOfWeek = (): Dayjs => dayjs().startOf("week");
-const getEndOfWeek = (): Dayjs => dayjs().endOf("week");
 
 interface CustomHeaderProps {
   setVisibleSections: React.Dispatch<
@@ -38,13 +31,14 @@ interface CustomHeaderProps {
       achievements: boolean;
     }>
   >;
-  onDateChange: (dates: [Dayjs, Dayjs]) => void;
+  onChange: (dates: [Dayjs, Dayjs]) => void;
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({
   setVisibleSections,
-  onDateChange,
 }) => {
+  const dispatch = useDispatch();
+  const { startDate, endDate } = useSelector(selectDateRange);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
 
@@ -119,7 +113,10 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 
   const handleDateChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
     if (dates && dates[0] && dates[1]) {
-      onDateChange([dates[0], dates[1]]);
+      dispatch(setDateRange({ 
+        startDate: dates[0].format("YYYY-MM-DD"), // ✅ 文字列に変換して保存
+        endDate: dates[1].format("YYYY-MM-DD")
+      }));
     }
   };
 
@@ -142,9 +139,9 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
         <label htmlFor="period">期間</label>
         <RangePicker
           id="period"
-          onChange={handleDateChange}
+          onChange={handleDateChange} // ✅ onChange に修正
           format="YYYY-MM-DD"
-          defaultValue={[getStartOfWeek(), getEndOfWeek()]}
+          value={[startDate, endDate]} // Reduxの値を反映
           placeholder={["開始日", "終了日"]}
           className="custom-range-picker"
         />
