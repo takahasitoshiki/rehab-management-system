@@ -64,3 +64,30 @@ export const fetchReservations = async (): Promise<Reservation[]> => {
     throw error; // 呼び出し元で処理
   }
 };
+
+export const updateReservation = async (reservation: Reservation): Promise<Reservation> => {
+  try {
+    if (!reservation.reservation_id) {
+      throw new Error("予約IDが見つかりません"); // _id がない場合にエラーを投げる
+    }
+    const response = await fetch(`${VITE_APP_RESERVATION_URL}/${reservation.reservation_id}`, {
+      method: "PUT", // ✅ PUTメソッドを使用
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(reservation), // ✅ 更新する予約データを送信
+    });
+
+    if (!response.ok) {
+      throw new Error(`APIエラー: ${response.status}`);
+    }
+
+    const updatedReservation = await response.json();
+    console.log("✅ 予約データ更新成功:", updatedReservation);
+
+    return updatedReservation as Reservation;
+  } catch (error) {
+    console.error("❌ 予約データ更新エラー:", error);
+    throw error; // 呼び出し元で処理
+  }
+};

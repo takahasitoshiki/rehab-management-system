@@ -79,7 +79,8 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     if (record.reservations?.length) {
       // ✅ undefined の場合を考慮
       setEditingReservation(record.reservations[0]);
-      openReservationModal(record, record.reservations[0].patient);
+      openReservationModal(record);
+      console.dir("クリックした項目:"+JSON.stringify(record, null, 2));
     }
   };
 
@@ -137,7 +138,7 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         patients={patients}
         loading={loading}
         generateTimeOptions={generateTimeOptions}
-        // editingReservation={editingReservation} // ✅ 編集対象の予約を渡す
+        editingReservation={editingReservation} // ✅ 編集対象の予約を渡す
       />
     </SectionWrapper>
   );
