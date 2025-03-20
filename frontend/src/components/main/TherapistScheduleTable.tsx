@@ -30,7 +30,6 @@ interface TherapistScheduleTableProps {
 const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   dataSource,
   handleRowDoubleClick,
-  // selectedDates,
   onDropPatient,
   patients,
 }) => {

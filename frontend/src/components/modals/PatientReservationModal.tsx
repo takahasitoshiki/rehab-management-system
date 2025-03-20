@@ -11,6 +11,7 @@ import {
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "dayjs/locale/ja";
 import { Reservation, createReservation, updateReservation } from "@/api/fetchReservation";
+import { getReservations } from "@/store/slices/reservationSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { fetchTherapists } from "@/store/slices/therapistSlice";
@@ -58,6 +59,8 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
 
   useEffect(() => {
     if (editingReservation) {
+      console.log("🆔 編集モード - 予約ID:", editingReservation._id); // ✅ 確認用ログ
+
       // ✅ 編集モードのとき
       form.setFieldsValue({
         therapist_id: editingReservation.therapist_id, // セラピストID
@@ -78,7 +81,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
     try {
       const values = await form.validateFields();
       const requestData: Reservation = {
-        reservation_id: editingReservation?.reservation_id || undefined, // ✅ 既存データのIDを保持
+        _id: editingReservation?._id || undefined, // ✅ 既存データのIDを保持
         patient_code:
           patients.find((p) => p.patients_name === values.patientName)
             ?.patients_code || "",
@@ -97,7 +100,9 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
         await createReservation(requestData); // ✅ 新規作成
         message.success("予約が登録されました");
       }
-  
+      // 予約リストを全て取り直す
+      dispatch(getReservations());
+      
       form.resetFields();
       setIsModalVisible(false);
     } catch (error) {

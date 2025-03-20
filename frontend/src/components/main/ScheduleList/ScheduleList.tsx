@@ -78,6 +78,8 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const handleRowDoubleClick = (record: TimeSlot) => {
     if (record.reservations?.length) {
       // ✅ undefined の場合を考慮
+      console.log("🆔 予約ID:", record.reservations.map(r => r.reservation_id));
+      
       setEditingReservation(record.reservations[0]);
       openReservationModal(record);
       console.dir("クリックした項目:"+JSON.stringify(record, null, 2));

@@ -3,7 +3,7 @@ import { Patient } from "@/api/fetchPatients";
 
 
 export interface Reservation {
-  reservation_id?: string; // ✅ MongoDB の `_id` (予約作成時には不要)
+  _id?: string; // ✅ MongoDB の `_id` (予約作成時には不要)
   patient_code: string;
   therapist_id: string;
   date: string;
@@ -67,10 +67,10 @@ export const fetchReservations = async (): Promise<Reservation[]> => {
 
 export const updateReservation = async (reservation: Reservation): Promise<Reservation> => {
   try {
-    if (!reservation.reservation_id) {
+    if (!reservation._id) {
       throw new Error("予約IDが見つかりません"); // _id がない場合にエラーを投げる
     }
-    const response = await fetch(`${VITE_APP_RESERVATION_URL}/${reservation.reservation_id}`, {
+    const response = await fetch(`${VITE_APP_RESERVATION_URL}${reservation._id}`, {
       method: "PUT", // ✅ PUTメソッドを使用
       headers: {
         "Content-Type": "application/json",
