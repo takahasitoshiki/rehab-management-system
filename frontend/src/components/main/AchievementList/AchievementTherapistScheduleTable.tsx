@@ -2,11 +2,10 @@ import React, { useEffect } from "react";
 import { fetchTherapists } from "@/store/slices/therapistSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  getReservations,
-  selectReservations,
+  getCompletedReservations,
   selectReservationsLoading,
 } from "@/store/slices/reservationSlice";
-import {selectSelectedDates} from "@/store/slices/dateSlice";
+import { selectSelectedDates } from "@/store/slices/dateSlice";
 import { RootState, AppDispatch } from "@/store";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
@@ -26,24 +25,27 @@ interface AchievementTherapistScheduleTableProps {
   patients: Patient[];
 }
 
-const AchievementTherapistScheduleTable: React.FC<AchievementTherapistScheduleTableProps> = ({
-  dataSource,
-  handleRowDoubleClick,
-  onDropPatient,
-  patients,
-}) => {
+const AchievementTherapistScheduleTable: React.FC<
+  AchievementTherapistScheduleTableProps
+> = ({ dataSource, handleRowDoubleClick, onDropPatient, patients }) => {
   const selectedDates = useSelector(selectSelectedDates); // ✅ Redux から selectedDates を取得
-  const reservations = useSelector(selectReservations);
   const loading = useSelector(selectReservationsLoading);
   const therapists = useSelector(
     (state: RootState) => state.therapists.therapists
   );
   const dispatch = useDispatch<AppDispatch>();
 
+  const completedReservations = useSelector(
+    (state: RootState) => state.reservations.completedReservations
+  );
+
   useEffect(() => {
     dispatch(fetchTherapists());
-    dispatch(getReservations());
-  }, [dispatch]);
+
+    if (completedReservations.length === 0) {
+      dispatch(getCompletedReservations()); // ✅ 既にデータがあれば再取得しない
+    }
+  }, [dispatch, completedReservations.length]);
 
   const groupTimeSlots = (slots: TimeSlot[]) => {
     const grouped: Record<string, TimeSlot[]> = {};
@@ -79,7 +81,7 @@ const AchievementTherapistScheduleTable: React.FC<AchievementTherapistScheduleTa
     const schedule: TimeSlot[] = [];
 
     dataSource.forEach((slot) => {
-      const matchingReservations = reservations.filter(
+      const matchingReservations = completedReservations.filter(
         (res) =>
           res.therapist_id.trim().toUpperCase() ===
             therapistId.trim().toUpperCase() &&
@@ -90,17 +92,17 @@ const AchievementTherapistScheduleTable: React.FC<AchievementTherapistScheduleTa
 
       if (matchingReservations.length > 0) {
         matchingReservations.forEach((reservation, idx) => {
-            const patient = patients?.find(
-              (p) => p.patients_code === reservation.patient_code
-            );
-            schedule.push({
-              ...slot,
-              key: `${slot.hour}-${slot.minute}-${idx}`,
-              patient: patient?.patients_name || "",
-              therapist_id: therapistId,
-              date: date.format("YYYY-MM-DD"),
-              reservations: [reservation],
-            });
+          const patient = patients?.find(
+            (p) => p.patients_code === reservation.patient_code
+          );
+          schedule.push({
+            ...slot,
+            key: `${slot.hour}-${slot.minute}-${idx}`,
+            patient: patient?.patients_name || "",
+            therapist_id: therapistId,
+            date: date.format("YYYY-MM-DD"),
+            reservations: [reservation],
+          });
         });
       } else {
         schedule.push({

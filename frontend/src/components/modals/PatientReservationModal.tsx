@@ -11,7 +11,7 @@ import {
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "dayjs/locale/ja";
 import { Reservation, createReservation, updateReservation } from "@/api/fetchReservation";
-import { getReservations } from "@/store/slices/reservationSlice";
+import { getReservations, getCompletedReservations } from "@/store/slices/reservationSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { fetchTherapists } from "@/store/slices/therapistSlice";
@@ -102,6 +102,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
       }
       // 予約リストを全て取り直す
       dispatch(getReservations());
+      dispatch(getCompletedReservations()); // ✅ 完了済み予約も取得
       
       form.resetFields();
       setIsModalVisible(false);
