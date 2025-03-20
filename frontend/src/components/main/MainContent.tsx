@@ -95,7 +95,7 @@ const MainContent: React.FC<MainContentProps> = ({
         {visibleSections.achievements && (
           <div style={{ ...getSectionStyle("achievements"), flex: 4, overflowX: "hidden", minWidth: "500px" }}>
             <MainHeader title="実績一覧" onClose={() => handleClose("achievements")} onMaximize={() => handleMaximize("achievements")} />
-            <AchievementList selectedDates={selectedDates} /> 
+            <AchievementList selectedDates={selectedDates} onDropPatient={onDropPatient} dataSource={dataSource} setDataSource={setDataSource} />
           </div>
         )}
       </div>

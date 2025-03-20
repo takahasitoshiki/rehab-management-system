@@ -3,30 +3,32 @@ import { Form, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots, TimeSlot } from "@/utils/timeSlotGenerator";
 import dayjs, { Dayjs } from "dayjs";
-import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
+import AchievementTherapistScheduleTable from "@/components/main/AchievementList/AchievementTherapistScheduleTable";
 import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
-
-interface Patient {
-  patients_code: string;
-  patients_name: string;
-  classification: string;
-}
+import { Patient } from "@/api/fetchPatients";
+import { Reservation } from "@/api/fetchReservation";
 
 interface ScheduleListProps {
   selectedDates: [Dayjs, Dayjs];
-  onDropPatient: (timeSlotKey: string, patientName: string) => void;
+  onDropPatient: (
+    record: TimeSlot,
+    patient: Patient,
+    updatedReservations: Reservation[]
+  ) => void; // ✅ 修正
   dataSource: TimeSlot[];
   setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>;
 }
 
-const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
+const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState<TimeSlot[]>(generateTimeSlots());
-  const [droppedPatient, setDroppedPatient ] = useState< Patient| null>(null)
+  const [droppedPatient, setDroppedPatient] = useState<Patient | null>(null);
+  const [editingReservation, setEditingReservation] =
+    useState<Reservation | null>(null);
 
   useEffect(() => {
     const loadPatients = async () => {
@@ -35,7 +37,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         const data = await fetchPatientsList();
         if (!Array.isArray(data)) throw new Error("データが配列ではありません");
         setPatients(data);
-        setDataSource(generateTimeSlots(data || [])); // ✅ `undefined` の場合、空配列を渡す
       } catch (error) {
         console.error("エラー:", error);
         message.error("患者情報の取得に失敗しました。");
@@ -58,54 +59,75 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
     }
     return times;
   };
-
-  // ダブルクリック時にモーダルを開く
-  const handleRowDoubleClick = (record: TimeSlot) => {
-    // フォームのデフォルト値を設定
+  // ✅ モーダルを開く共通関数
+  const openReservationModal = (record: TimeSlot, patient?: Patient) => {
     form.setFieldsValue({
-      time: `${record.hour}:${record.minute}`, // クリックした行の時間データをセット
-      date: dayjs(), // 予約日を現在の日付に設定
+      time: `${record.hour}:${record.minute}`,
+      date: record.date ? dayjs(record.date) : dayjs(), // ✅ 正しい日付をセット
+      therapist_id: record.therapist_id, // ✅ therapist_id をセット
     });
+    if (patient) {
+      setDroppedPatient(patient); // ✅ 患者情報がある場合のみセット
+    } else {
+      setDroppedPatient(null); // ✅ クリック時は患者情報なし
+    }
 
     setIsModalVisible(true);
   };
 
+  const handleRowDoubleClick = (record: TimeSlot) => {
+    if (record.reservations?.length) {
+      // ✅ undefined の場合を考慮
+      setEditingReservation(record.reservations[0]);
+      openReservationModal(record);
+      console.dir("クリックした項目:"+JSON.stringify(record, null, 2));
+    }
+  };
 
-  const onDropPatient = (timeSlotKey: string, patient: Patient) => {
+  // ✅ 患者をドロップした時の処理
+  const onDropPatient = (record: TimeSlot, patient: Patient) => {
+    console.log("🟢 onDropPatient 呼び出し - record:", record);
+    console.log("🟢 onDropPatient 呼び出し - patient:", patient);
+    console.log("🟢 onDropPatient - record.therapist_id:", record.therapist_id);
 
     setDataSource((prevData) =>
       prevData.map((slot) =>
-        slot.key === timeSlotKey ? { ...slot, patient: patient.patients_name } : slot
+        slot.key === record.key
+          ? {
+              ...slot,
+              patient: patient.patients_name,
+              date: record.date ?? dayjs().format("YYYY-MM-DD"), // ✅ `date` をセット
+              therapist_id: record.therapist_id, // ✅ therapist_id を維持
+            }
+          : slot
       )
     );
-      const droppedSlot = dataSource.find((slot) => slot.key === timeSlotKey);
-    if (droppedSlot) {
-      form.setFieldsValue({
-        time: `${droppedSlot.hour}:${droppedSlot.minute}`, 
-        date: dayjs(), 
-      });
-    }
-    setDroppedPatient(patient)
-    setIsModalVisible(true);
+
+    openReservationModal(record, patient);
   };
 
   useEffect(() => {
-    if(isModalVisible && droppedPatient){
+    if (isModalVisible && droppedPatient) {
+      console.log(
+        "droppedPatient.patients_name:",
+        droppedPatient.patients_name
+      );
       form.setFieldsValue({
-        patientName:droppedPatient.patients_name,
-        date: dayjs(),
-      })
+        patientName: droppedPatient.patients_name,
+      });
     }
-  },[isModalVisible, droppedPatient, form])
+    console.log("🛠 Generated Time Slots:", generateTimeSlots());
+  }, [isModalVisible, droppedPatient, dataSource, form]);
 
   return (
     <SectionWrapper>
       {/* TherapistScheduleTable コンポーネントを利用 */}
-      <TherapistScheduleTable
+      <AchievementTherapistScheduleTable
         dataSource={dataSource}
         handleRowDoubleClick={handleRowDoubleClick}
         selectedDates={selectedDates}
         onDropPatient={onDropPatient}
+        patients={patients} // ✅ 追加
       />
 
       {/* 予約ダイアログ */}
@@ -116,9 +138,10 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
         patients={patients}
         loading={loading}
         generateTimeOptions={generateTimeOptions}
+        editingReservation={editingReservation} // ✅ 編集対象の予約を渡す
       />
     </SectionWrapper>
   );
 };
 
-export default ScheduleList;
+export default AchievementList;

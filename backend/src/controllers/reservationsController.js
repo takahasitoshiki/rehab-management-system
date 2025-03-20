@@ -105,6 +105,6 @@ exports.completedReservations = async (req, res) => {
     const reservations = await Reservation.find(query);
     res.status(200).json(reservations);
   } catch (error) {
-    res.status(500).json({ error: "予約の検索に失敗しました。" });
+    res.status(500).json({ error: "完了した予約のみの取得ができませんでした。" });
   }
 };

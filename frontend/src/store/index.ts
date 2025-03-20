@@ -9,7 +9,7 @@ import dateReducer from "./slices/dateSlice";
 export const store = configureStore({
   reducer: {
     therapists: therapistReducer,
-    reservations: reservationReducer, // ✅ 追加
+    reservations: reservationReducer, 
     date:dateReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger), // ✅ ログを出力

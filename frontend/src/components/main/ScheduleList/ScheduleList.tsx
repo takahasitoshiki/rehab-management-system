@@ -3,7 +3,7 @@ import { Form, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots, TimeSlot } from "@/utils/timeSlotGenerator";
 import dayjs, { Dayjs } from "dayjs";
-import TherapistScheduleTable from "@/components/main/TherapistScheduleTable";
+import TherapistScheduleTable from "@/components/main/ScheduleList/TherapistScheduleTable";
 import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
 import { Patient } from "@/api/fetchPatients";
@@ -78,8 +78,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
   const handleRowDoubleClick = (record: TimeSlot) => {
     if (record.reservations?.length) {
       // ✅ undefined の場合を考慮
-      console.log("🆔 予約ID:", record.reservations.map(r => r.reservation_id));
-      
       setEditingReservation(record.reservations[0]);
       openReservationModal(record);
       console.dir("クリックした項目:"+JSON.stringify(record, null, 2));
