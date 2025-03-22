@@ -13,6 +13,7 @@ const app = express();
 // CORS設定
 app.use(cors({
     origin: 'http://localhost:5173', // Reactの開発サーバーURL
+    credentials: true
 }));
 
 // MongoDB に接続
@@ -39,6 +40,9 @@ app.use('/api/patients', patientRoutes);
 // 患者登録関連
 app.use('/api/reservation', reservationController);
 
+// レポート関連
+const reportRoutes = require("./src/routes/reportRoutes.js"); // 追加
+app.use('/api/report', reportRoutes); // 追加
 
 // サーバーの起動
 const PORT = process.env.PORT || 8000;

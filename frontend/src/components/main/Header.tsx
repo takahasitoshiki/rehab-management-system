@@ -14,7 +14,10 @@ import { DatePicker, Modal } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { setDateRange, selectDateRange } from "@/store/slices/dateSlice";
 import PatientRegistrationContent from "../../components/main/headerBtnComponent/PatientRegistrationContent";
+import TherapistRegistrationContent from "../../components/main/headerBtnComponent/TherapistRegistrationContent";
 import { Dayjs } from "dayjs";
+import { AppDispatch } from "@/store";
+import { reportCompletedReservations } from "@/store/slices/reservationSlice"; // ← Thunk
 
 type ButtonData = {
   iconSrc: string;
@@ -34,10 +37,8 @@ interface CustomHeaderProps {
   onChange: (dates: [Dayjs, Dayjs]) => void;
 }
 
-const CustomHeader: React.FC<CustomHeaderProps> = ({
-  setVisibleSections,
-}) => {
-  const dispatch = useDispatch();
+const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const { startDate, endDate } = useSelector(selectDateRange);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
@@ -56,19 +57,17 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
     {
       iconSrc: Therapist,
       altText: "セラピスト登録",
-      modalContent: <PatientRegistrationContent />,
+      modalContent: <TherapistRegistrationContent />,
     },
     {
       iconSrc: Reservation_List,
       altText: "予約一覧",
       sectionKey: "schedules",
-      modalContent: <PatientRegistrationContent />,
     },
     {
       iconSrc: Achievements,
       altText: "実績一覧",
       sectionKey: "achievements",
-      modalContent: <PatientRegistrationContent />,
     },
     {
       iconSrc: update,
@@ -113,10 +112,28 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 
   const handleDateChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
     if (dates && dates[0] && dates[1]) {
-      dispatch(setDateRange({ 
-        startDate: dates[0].format("YYYY-MM-DD"), // ✅ 文字列に変換して保存
-        endDate: dates[1].format("YYYY-MM-DD")
-      }));
+      dispatch(
+        setDateRange({
+          startDate: dates[0].format("YYYY-MM-DD"), // ✅ 文字列に変換して保存
+          endDate: dates[1].format("YYYY-MM-DD"),
+        })
+      );
+    }
+  };
+
+  const handleReportClick = async () => {
+    try {
+      const result = await dispatch(reportCompletedReservations()).unwrap();
+      Modal.success({
+        title: "送信完了",
+        content: `${result.length} 件の実績を送信しました`,
+      });
+    } catch (error) {
+      Modal.error({
+        title: "送信失敗",
+        content: "実績送信に失敗しました。再度お試しください。",
+      });
+      console.error("実績送信エラー:", error);
     }
   };
 
@@ -146,7 +163,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
           className="custom-range-picker"
         />
       </div>
-      <button className="report-button">
+      <button className="report-button" onClick={handleReportClick}>
         <img src={Sending} alt="実績報告" className="button-icon" />
         実績報告
       </button>

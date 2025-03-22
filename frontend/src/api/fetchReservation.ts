@@ -12,6 +12,7 @@ export interface Reservation {
   completed?: boolean; // ✅ デフォルト false
   rehabilitation_details?: string; // ✅ デフォルト ""
   patient?: Patient;
+  reported: boolean; // ✅ デフォルト false
 }
   
   export const createReservation = async (data: Reservation): Promise<void> => {

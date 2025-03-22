@@ -5,6 +5,7 @@ import {
   completedReservation,
   Reservation,
 } from "@/api/fetchReservation";
+import { sendCompletedReservations } from "@/api/reportApi";
 
 // ✅ Redux Thunk で予約取得
 export const getReservations = createAsyncThunk(
@@ -32,11 +33,36 @@ export const getCompletedReservations = createAsyncThunk(
   }
 );
 
+export const reportCompletedReservations = createAsyncThunk<
+  string[], // 成功した予約の ID 一覧
+  void,
+  { state: RootState }
+>(
+  "reservations/reportCompletedReservations",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState();
+      const toReport: Reservation[] =
+        state.reservations.completedReservations.filter((r) => !r.reported);
+
+      await sendCompletedReservations(toReport);
+
+      // 成功した予約IDだけ返す（仮に全部成功したとする）
+      return toReport
+        .map((r) => r._id)
+        .filter((id): id is string => typeof id === "string");
+    } catch (error) {
+      console.error(error);
+      return rejectWithValue("送信に失敗しました");
+    }
+  }
+);
+
 const reservationSlice = createSlice({
   name: "reservations",
   initialState: {
     reservations: [] as Reservation[],
-    completedReservations: [] as Reservation[], 
+    completedReservations: [] as Reservation[],
     loading: false,
     error: null as string | null,
   },
@@ -56,7 +82,6 @@ const reservationSlice = createSlice({
         state.error = action.payload as string;
       })
 
-
       // ✅ 完了済み予約取得
       .addCase(getCompletedReservations.pending, (state) => {
         state.loading = true;
@@ -64,11 +89,22 @@ const reservationSlice = createSlice({
       })
       .addCase(getCompletedReservations.fulfilled, (state, action) => {
         state.loading = false;
-        state.completedReservations = action.payload; 
+        state.completedReservations = action.payload;
       })
       .addCase(getCompletedReservations.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+
+      // ✅ 送信成功後に reported = true を付ける
+      .addCase(reportCompletedReservations.fulfilled, (state, action) => {
+        const sentIds = action.payload;
+        state.completedReservations = state.completedReservations.map((res) => {
+          if (res._id && sentIds.includes(res._id)) {
+            return { ...res, reported: true };
+          }
+          return res;
+        });
       });
   },
 });
