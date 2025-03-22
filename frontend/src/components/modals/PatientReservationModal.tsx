@@ -10,18 +10,16 @@ import {
 } from "antd";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "dayjs/locale/ja";
-import { Reservation, createReservation, updateReservation } from "@/api/fetchReservation";
+import { createReservation, updateReservation } from "@/api/fetchReservation";
 import { getReservations, getCompletedReservations } from "@/store/slices/reservationSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { fetchTherapists } from "@/store/slices/therapistSlice";
+import { Reservation } from "@/types/reservation";
 import dayjs from "dayjs";
 import { useEffect } from "react";
+import { Patient } from "@/types/patient";
 
-interface Patient {
-  patients_code: string;
-  patients_name: string;
-}
 
 interface PatientReservationModalProps {
   isModalVisible: boolean;

@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Form, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots, TimeSlot } from "@/utils/timeSlotGenerator";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, {  } from "dayjs";
 import AchievementTherapistScheduleTable from "@/components/main/AchievementList/AchievementTherapistScheduleTable";
 import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
-import { Patient } from "@/api/fetchPatients";
-import { Reservation } from "@/api/fetchReservation";
+import { Patient } from "@/types/patient";
+import { Reservation } from "@/types/reservation";
 
 interface ScheduleListProps {
-  selectedDates: [Dayjs, Dayjs];
+  // selectedDates: [Dayjs, Dayjs];
   onDropPatient: (
     record: TimeSlot,
     patient: Patient,
@@ -20,7 +20,7 @@ interface ScheduleListProps {
   setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>;
 }
 
-const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
+const AchievementList: React.FC<ScheduleListProps> = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -125,12 +125,11 @@ const AchievementList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
       <AchievementTherapistScheduleTable
         dataSource={dataSource}
         handleRowDoubleClick={handleRowDoubleClick}
-        selectedDates={selectedDates}
         onDropPatient={onDropPatient}
         patients={patients} // ✅ 追加
       />
 
-      {/* 予約ダイアログ */}
+      予約ダイアログ
       <PatientReservationModal
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}

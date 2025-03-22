@@ -3,13 +3,8 @@ import { message, Table, Spin } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { fetchPatientsList } from "@/api/fetchPatients";
 import { useDrag } from "react-dnd";
+import { Patient } from "@/types/patient";
 
-interface Patient {
-  _id: string;
-  patients_code: string;
-  patients_name: string;
-  classification: string;
-}
 
 const PatientList: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);

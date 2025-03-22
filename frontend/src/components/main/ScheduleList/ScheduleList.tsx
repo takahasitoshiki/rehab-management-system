@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Form, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots, TimeSlot } from "@/utils/timeSlotGenerator";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, {  } from "dayjs";
 import TherapistScheduleTable from "@/components/main/ScheduleList/TherapistScheduleTable";
 import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
-import { Patient } from "@/api/fetchPatients";
-import { Reservation } from "@/api/fetchReservation";
+import { Patient } from "@/types/patient";
+import { Reservation } from "@/types/reservation";
 
 interface ScheduleListProps {
-  selectedDates: [Dayjs, Dayjs];
+  // selectedDates: [Dayjs, Dayjs];
   onDropPatient: (
     record: TimeSlot,
     patient: Patient,
@@ -20,7 +20,7 @@ interface ScheduleListProps {
   setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>;
 }
 
-const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
+const ScheduleList: React.FC<ScheduleListProps> = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -125,7 +125,6 @@ const ScheduleList: React.FC<ScheduleListProps> = ({ selectedDates }) => {
       <TherapistScheduleTable
         dataSource={dataSource}
         handleRowDoubleClick={handleRowDoubleClick}
-        selectedDates={selectedDates}
         onDropPatient={onDropPatient}
         patients={patients} // ✅ 追加
       />

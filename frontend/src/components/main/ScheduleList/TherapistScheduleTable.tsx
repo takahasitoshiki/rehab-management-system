@@ -14,7 +14,7 @@ import isBetween from "dayjs/plugin/isBetween";
 import { Table } from "antd";
 import { createScheduleColumns } from "@/constants/scheduleColumns";
 import { Therapist } from "@/types/therapists";
-import { Patient } from "@/types/Patient";
+import { Patient } from "@/types/patient";
 import { TimeSlot } from "@/utils/timeSlotGenerator";
 
 dayjs.extend(isBetween);
@@ -53,7 +53,7 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       grouped[key] = [...(grouped[key] || []), slot];
     });
 
-    const hourGroups = slots.reduce((acc: any, slot) => {
+    const hourGroups = slots.reduce<Record<string, number>>((acc, slot) => {
       acc[slot.hour] = (acc[slot.hour] || 0) + 1;
       return acc;
     }, {});

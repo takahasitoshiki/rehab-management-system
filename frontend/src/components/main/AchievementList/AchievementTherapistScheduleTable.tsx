@@ -12,7 +12,8 @@ import isBetween from "dayjs/plugin/isBetween";
 import { Table } from "antd";
 import { createScheduleColumns } from "@/constants/AchievementScheduleColumns";
 import { Therapist } from "@/types/therapists";
-import { Patient } from "@/types/Patient";
+import { Patient } from "@/types/patient";
+import { Reservation } from "@/types/reservation";
 import { TimeSlot } from "@/utils/timeSlotGenerator";
 
 dayjs.extend(isBetween);
@@ -21,7 +22,7 @@ interface AchievementTherapistScheduleTableProps {
   dataSource: TimeSlot[];
   handleRowDoubleClick: (record: TimeSlot) => void;
   selectedDates: [Dayjs, Dayjs] | null;
-  onDropPatient: (record: TimeSlot, patient: Patient) => void;
+  onDropPatient: (record: TimeSlot, patient: Patient, updatedReservations: Reservation[]) => void;
   patients: Patient[];
 }
 
@@ -54,7 +55,7 @@ const AchievementTherapistScheduleTable: React.FC<
       grouped[key] = [...(grouped[key] || []), slot];
     });
 
-    const hourGroups = slots.reduce((acc: any, slot) => {
+    const hourGroups = slots.reduce<Record<string, number>>((acc, slot) => {
       acc[slot.hour] = (acc[slot.hour] || 0) + 1;
       return acc;
     }, {});

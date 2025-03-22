@@ -35,7 +35,6 @@ interface CustomHeaderProps {
       achievements: boolean;
     }>
   >;
-  onChange: (dates: [Dayjs, Dayjs]) => void;
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
