@@ -11,14 +11,21 @@ const PatientRegistrationContent: React.FC = () => {
   const [form] = Form.useForm();
 
   const handleSubmit = async (values: Patient) => {
-    try{
-      const response = await fetchPatientsRegister(values);
+    try {
+      const { patients_code, date_of_birth, registration_date, ...rest } = values;
+  
+      const dataToSend = {
+        ...rest,
+        date_of_birth: dayjs(date_of_birth).toISOString(),
+        registration_date: dayjs(registration_date).toISOString()
+      };
+  
+      const response = await fetchPatientsRegister(dataToSend);
       console.log("登録された患者情報:", response);
-      // 成功メッセージを表示
-      message.success("患者情報が登録されました。")
+      message.success("患者情報が登録されました。");
       form.resetFields();
-    }catch(error){
-      console.error("登録エラー:"+ error)
+    } catch (error) {
+      console.error("登録エラー:", error);
       message.error("患者情報の登録に失敗しました。");
     }
   };

@@ -3,36 +3,31 @@ const Patient = require("../models/patient");
 // 患者登録
 exports.registerPatient = async (req, res) => {
   try {
-    // 最新の患者コードを入手
+    // 最新の患者コードを取得（patients_codeの降順）
     const lastPatient = await Patient.findOne({}, "patients_code")
       .sort({ patients_code: -1 })
       .lean();
-    console.log("latest patient code:", lastPatient.patients_code);
 
-    // patients_codeの処理
-    let newCode =
-      lastPatient && lastPatient.patients_code
-        ? parseInt(lastPatient.patients_code.replace("PA", ""), 10) + 1
-        : 1;
+    const lastCode = lastPatient?.patients_code || null;
+    console.log("latest patient code:", lastCode);
+
+    let newCode = lastCode
+      ? parseInt(lastCode.replace("PA", ""), 10) + 1
+      : 1;
 
     if (Number.isNaN(newCode)) {
-      console.warn(
-        "⚠ patients_code の取得に失敗しました。デフォルトの 'PA001' を使用します。"
-      );
-      newCode = 1; // 変数名を合わせる
+      console.warn("⚠ 患者コード生成失敗、デフォルト 'PA001' を使用します。");
+      newCode = 1;
     }
 
     const nextPatientCode = `PA${String(newCode).padStart(3, "0")}`;
 
-    // 🔹 患者コードの重複チェック
-    const existingPatient = await Patient.findOne({
-      patients_code: nextPatientCode,
-    });
+    // 重複チェック
+    const existingPatient = await Patient.findOne({ patients_code: nextPatientCode });
     if (existingPatient) {
       return res.status(400).json({ message: "患者コードが重複しています" });
     }
 
-    // 4. リクエストボディからデータを受け取り、患者情報を作成
     const {
       patients_name,
       disease_name,
@@ -57,13 +52,16 @@ exports.registerPatient = async (req, res) => {
     });
 
     const savedPatient = await newPatient.save();
-    res
-      .status(201)
-      .json({ message: "患者情報が登録されました", patient: savedPatient });
+    res.status(201).json({
+      message: "患者情報が登録されました",
+      patient: savedPatient,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "患者情報の登録に失敗しました", details: error.message });
+    console.error("💥 登録エラー:", error);
+    res.status(500).json({
+      error: "患者情報の登録に失敗しました",
+      details: error.message,
+    });
   }
 };
 

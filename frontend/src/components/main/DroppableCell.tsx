@@ -1,7 +1,7 @@
 import React from "react";
 import { useDrop } from "react-dnd";
 import { TimeSlot } from "@/utils/timeSlotGenerator";
-import { Patient } from "@/types/Patient";
+import { Patient } from "@/types/patient";
 
 interface DroppableCellProps {
   record: TimeSlot;

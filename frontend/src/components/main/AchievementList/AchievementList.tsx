@@ -129,7 +129,6 @@ const AchievementList: React.FC<ScheduleListProps> = () => {
         patients={patients} // ✅ 追加
       />
 
-      予約ダイアログ
       <PatientReservationModal
         isModalVisible={isModalVisible}
         setIsModalVisible={setIsModalVisible}

@@ -1,7 +1,7 @@
 // types/Patient.ts
 export interface Patient {
   _id?: string;
-  patients_code: string;
+  patients_code?: string | undefined;
   patients_name: string;
   disease_name: string;
   classification: string;

@@ -190,7 +190,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
         </Form.Item>
 
         {/* ✅ 完了ステータス */}
-        <Form.Item name="completed" label="完了ステータス">
+        <Form.Item name="completed" label="完了ステータス" initialValue={false}>
           <Select placeholder="完了状態を選択">
             <Option value={false}>未完了</Option>
             <Option value={true}>完了</Option>

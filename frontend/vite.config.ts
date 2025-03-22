@@ -13,4 +13,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'), // `@` を `src` にエイリアス設定
     },
   },
+  server: {
+    host: true, // ← 外部（Docker外）からアクセスを許可
+    port: 5173,
+  },
 });
