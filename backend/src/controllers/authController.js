@@ -104,7 +104,7 @@ exports.loginUser = async (req, res) => {
 };
 
 const blacklist = new Set(); // トークンのブラックリストを管理するセット
-
+console.log("ブラックリストの中身:", Array.from(blacklist));
 // ユーザーログアウト
 exports.logoutUser = (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
