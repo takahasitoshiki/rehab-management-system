@@ -103,6 +103,48 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+const blacklist = new Set(); // トークンのブラックリストを管理するセット
+
+// ユーザーログアウト
+exports.logoutUser = (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(400).json({ message: "トークンが提供されていません。" });
+  }
+
+  try {
+    // トークンをブラックリストに追加
+    blacklist.add(token);
+    res.status(200).json({ message: "ログアウトに成功しました。" });
+  } catch (error) {
+    console.error("ログアウトエラー:", error);
+    res.status(500).json({ message: "サーバーエラーが発生しました。" });
+  }
+};
+
+// トークンの検証時にブラックリストをチェックするミドルウェア
+exports.verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "認証トークンが必要です。" });
+  }
+
+  if (blacklist.has(token)) {
+    return res.status(401).json({ message: "このトークンは無効です。" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error("トークン検証エラー:", error);
+    res.status(401).json({ message: "無効なトークンです。" });
+  }
+};
+
 // ユーザー取得
 exports.getAllUser = async (req, res) => {
   try {

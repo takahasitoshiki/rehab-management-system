@@ -5,7 +5,7 @@ import {
   Therapist,
   Reservation_List,
   Achievements,
-  update,
+  // update,
   Reset,
   Sending,
 } from "@/assets/icon";
@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setDateRange, selectDateRange } from "@/store/slices/dateSlice";
 import PatientRegistrationContent from "../../components/main/headerBtnComponent/PatientRegistrationContent";
 import TherapistRegistrationContent from "../../components/main/headerBtnComponent/TherapistRegistrationContent";
+import LogoutButton from "../../components/main/headerBtnComponent/LogoutContent";
 import { Dayjs } from "dayjs";
 import { AppDispatch } from "@/store";
 import { reportCompletedReservations } from "@/store/slices/reservationSlice"; // ← Thunk
@@ -70,14 +71,9 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
       sectionKey: "achievements",
     },
     {
-      iconSrc: update,
-      altText: "同期",
-      modalContent: <PatientRegistrationContent />,
-    },
-    {
       iconSrc: Reset,
       altText: "終了",
-      modalContent: <PatientRegistrationContent />,
+      modalContent: <LogoutButton />,
     },
   ];
 

@@ -26,3 +26,5 @@ export const createTherapist = async (therapist: Therapist) => {
     return null  ; // エラー時は空の配列を返す
   }
 };
+
+
