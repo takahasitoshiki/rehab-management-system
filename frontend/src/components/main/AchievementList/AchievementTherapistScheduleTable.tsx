@@ -10,7 +10,7 @@ import { RootState, AppDispatch } from "@/store";
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { Table } from "antd";
-import { createScheduleColumns } from "@/constants/scheduleColumns";
+import { createScheduleColumns } from "@/constants/AchievementScheduleColumns";
 import { Therapist } from "@/types/therapists";
 import { Patient } from "@/types/Patient";
 import { TimeSlot } from "@/utils/timeSlotGenerator";

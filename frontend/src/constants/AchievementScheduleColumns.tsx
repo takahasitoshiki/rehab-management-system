@@ -1,6 +1,5 @@
 import React from "react";
 import { TimeSlot } from "@/utils/timeSlotGenerator";
-import { Tag } from "antd";
 import { Patient } from "@/types/Patient";
 import DroppableCell from "@/components/main/DroppableCell";
 
@@ -27,17 +26,10 @@ export const createScheduleColumns = (
     dataIndex: "patient",
     key: "patient",
     width: 250,
-    render: (_: string, record: TimeSlot) => {
-      const isCompleted = record.reservations?.[0]?.completed;
-  
-      return (
-        <DroppableCell record={record} onDropPatient={onDropPatient}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5em" }}>
-            <span>{record.patient}</span>
-            {isCompleted && <Tag color="green">完了</Tag>}
-          </div>
-        </DroppableCell>
-      );
-    },
-  }
+    render: (_: string, record: TimeSlot) => (
+      <DroppableCell record={record} onDropPatient={onDropPatient}>
+        {record.patient}
+      </DroppableCell>
+    ),
+  },
 ];
