@@ -1,32 +1,92 @@
-# Rehab Management System
+# リハビリ予約・患者管理システム
 
-## 概要
-本システムは、理学療法士として働いていた経験を活かし、現場で感じた不便さを解消するために開発されたリハビリ管理システムです。患者の管理、予約のスケジューリング、リマインダー通知を効率的に行い、医療従事者の業務をサポートします。
+## ✨ アプリ概要
+病院やリハビリ施設向けに開発された、患者情報とリハビリ予約を一元管理できるWebアプリケーションです。
 
-## 特徴
-- 患者の基本情報と治療履歴を一元管理
-- 直感的なカレンダー表示による予約管理
-- リマインダー機能（メール通知など）
-- セラピストごとのスケジュール管理
+---
 
-## 技術スタック
-- **フロントエンド**: React.js
-- **バックエンド**: Node.js, Express
-- **データベース**: MongoDB (または PostgreSQL)
-- **認証**: Firebase Authentication
+## ⚙ユースケース
+- **療法士（セラピスト）** 向けの患者登録・編集機能
+- リハビリ予約の登録・管理
+- ログイン／ログアウトによる認証付き操作
 
-## セットアップ方法
-1. リポジトリをクローンします：
+---
 
-2. 必要なパッケージをインストールします：
+## ✨ 主な機能
+- 患者の新規登録 / 編集 / 削除
+- リハビリ予約の作成 / 編集 / 確認
+- ユーザー認証（JWTベース）
+- レスポンシブなUI（Ant Design使用）
 
-3. サーバーを起動します：
+---
 
+## 📊 技術スタック
+| カテゴリ | 技術 |
+|----------|-----------------------|
+| Frontend | React / TypeScript / Vite / Ant Design |
+| Backend  | Node.js / Express / Mongoose |
+| DB       | MongoDB Atlas (Cloud) |
+| Hosting  | AWS EC2 (Amazon Linux 2023) |
+| Infra    | Docker / Docker Compose |
+| その他    | .env による環境変数管理 |
 
-## 使い方
-1. ログインして、ユーザーアカウントを作成します。
-2. 新しい患者を登録し、治療履歴や予約を管理します。
-3. カレンダーを使用して、予約の確認とスケジュール調整を行います。
+---
 
-## ライセンス
-MIT License
+## 🔺開発フロー
+```
+rehab-management-system/
+├── frontend/          # React + Vite frontend
+├── backend/           # Node.js + Express backend
+├── docker-compose.yml # Docker一括起動用設定
+```
+
+---
+
+## 🚀 ローカル開発の立上
+```bash
+# ローカルで立上する場合
+$ git clone https://github.com/yourname/rehab-management-system.git
+$ cd rehab-management-system
+$ cp .env.example backend/.env
+$ docker-compose up --build
+```
+
+---
+
+## 🌐 EC2 での本番動作
+- AWS EC2 上にアプリを配置
+- Docker Compose で frontend / backend を立ち上げ
+- MongoDB Atlas URI を .env で管理
+
+```bash
+$ ssh -i ~/.ssh/aws-key.pem ec2-user@xx.xx.xx.xx
+$ cd rehab-management-system
+$ docker-compose up -d
+```
+
+---
+
+## 🌟 これからの改善ポイント
+- GitHub Actions で CI/CD 自動化
+- モバイル対応 (React Native 検討)
+- S3 や RDS への移行
+- i18n 対応 (日本語 / 英語)
+
+---
+
+## 🚫 注意
+- MongoDB Atlas URI は公開しないよう、.env で分離して管理しています
+- 変更するファイル
+    - docker-compose.yml
+    - /frontend/.env
+        - パブリックIPに書き換える；
+
+---
+
+## ✨ 開発者
+- today (https://github.com/yourname)
+
+---
+
+ご覧頂きありがとうございます！
+

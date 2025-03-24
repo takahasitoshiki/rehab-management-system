@@ -6,7 +6,7 @@ services:
       - "5173:5173"
     volumes:
       - ./frontend:/app
-      - /app/node_modules
+    working_dir: /app
     depends_on:
       - backend
     command: npm run dev
@@ -20,11 +20,14 @@ services:
       - /app/node_modules
     depends_on:
       - mongo
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/RehabilitationSchedule
+    env_file:
+      - ./backend/.env
+
+    command: npm start
 
   mongo:
     image: mongo
+    restart: always
     ports:
       - "27017:27017"
     volumes:
