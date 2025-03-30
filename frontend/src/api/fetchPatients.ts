@@ -9,7 +9,7 @@ export const fetchPatientsList = async () => {
         const response = await axios.get(`${VITE_APP_PATIENTS_URL}/all`); // テンプレートリテラルを修正
         return response.data.data || []; // 必要ならば .data を抽出
     }catch(error){
-        console.error("API呼び出し中にエラーが発生しました。:", error);
+        console.error("API呼び出し中にエラーが発生しました:", error);
         throw new Error("患者情報の取得に失敗しました");
     }
 }
