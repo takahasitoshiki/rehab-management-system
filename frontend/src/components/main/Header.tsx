@@ -60,7 +60,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
     {
       iconSrc: Therapist,
       altText: "セラピスト登録",
-      modalContent: <TherapistRegistrationContent />,
+      modalContent:( <TherapistRegistrationContent onClose={() => setIsModalVisible(false)} />) as React.ReactElement,
     },
     {
       iconSrc: Reservation_List,

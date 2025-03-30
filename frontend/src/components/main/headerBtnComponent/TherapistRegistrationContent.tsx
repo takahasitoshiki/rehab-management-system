@@ -1,10 +1,19 @@
 import React from "react";
 import { Form, Input,  Button, message, Row, Col } from "antd";
 import { Therapist, createTherapist } from "@/api/fetchTherapist";
+import { useDispatch } from "react-redux";
+import { fetchTherapists } from "@/store/slices/therapistSlice";
+import { AppDispatch } from "@/store";
 
 
-const TherapistRegistrationContent: React.FC = () => {
+interface TherapistRegistrationContentProps {
+  onClose: () => void;
+}
+
+const TherapistRegistrationContent: React.FC <TherapistRegistrationContentProps>= ({onClose}) => {
   const [form] = Form.useForm();
+  const dispatch = useDispatch<AppDispatch>();
+
 
   const handleSubmit = async (values: Therapist) => {
     try{
@@ -13,6 +22,8 @@ const TherapistRegistrationContent: React.FC = () => {
       // 成功メッセージを表示
       message.success("セラピスト情報が登録されました。")
       form.resetFields();
+      await dispatch(fetchTherapists());
+      onClose();
     }catch(error){
       console.error("登録エラー:"+ error)
       message.error("セラピスト情報の登録に失敗しました。");
@@ -48,7 +59,7 @@ const TherapistRegistrationContent: React.FC = () => {
               label="パスワード"
               rules={[{ required: true, message: "パスワードを入力してください" }]}
             >
-              <Input placeholder="例: password" />
+              <Input.Password placeholder="例: password" />
             </Form.Item>
           </Col>
         </Row>
