@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { message, Table, Spin } from "antd";
+import React, { useEffect } from "react";
+import { Table, Spin } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
-import { fetchPatientsList } from "@/api/fetchPatients";
+// import { fetchPatientsList } from "@/api/fetchPatients";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { getPatients } from "@/store/slices/patientsSlice";
 import { useDrag } from "react-dnd";
 import { Patient } from "@/types/patient";
 
 
 const PatientList: React.FC = () => {
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const { patients, loading } = useAppSelector((state) => state.patients);
 
   const columns = [
     { title: "患者コード", dataIndex: "patients_code", key: "patients_code" },
@@ -17,24 +19,11 @@ const PatientList: React.FC = () => {
   ];
 
   useEffect(() => {
-    const loadPatients = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchPatientsList();
-        if (!Array.isArray(data)) throw new Error("データが配列ではありません");
-        setPatients(data);
-      } catch (error) {
-        console.error("エラー:", error);
-        message.error("患者情報の取得に失敗しました。");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadPatients();
-  }, []);
+    dispatch(getPatients());
+  }, [dispatch]);
 
   // ✅ ドラッグ可能な行コンポーネント
-  const DraggableRow: React.FC<{ children: React.ReactNode; "data-row-key"?: string; patients: Patient[] }> = ({
+  const DraggableRow: React.FC<{ children?: React.ReactNode; "data-row-key"?: string; patients: Patient[] }> = ({
     children,
     "data-row-key": dataRowKey,
     patients,
@@ -83,7 +72,7 @@ const PatientList: React.FC = () => {
           pagination={false}
           components={{
             body: {
-              row: (props) => {
+              row: (props: React.HTMLAttributes<HTMLTableRowElement>) => {
                 return <DraggableRow {...props} patients={patients} />; // ✅ `patients` を渡す
               },
             },

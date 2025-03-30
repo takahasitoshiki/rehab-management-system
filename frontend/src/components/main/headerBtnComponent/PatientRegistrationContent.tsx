@@ -1,29 +1,46 @@
 import React from "react";
-import { Form, Input, Select, DatePicker, Button, message, Row, Col } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Button,
+  message,
+  Row,
+  Col,
+} from "antd";
 import dayjs from "dayjs";
-import {fetchPatientsRegister } from "@/api/fetchPatients";
+import { useAppDispatch } from "@/store/hooks";
+import { registerPatient, getPatients } from "@/store/slices/patientsSlice";
 import { Patient } from "@/types/patient";
-
 
 const { Option } = Select;
 
-const PatientRegistrationContent: React.FC = () => {
+interface PatientRegistrationContentProps {
+  onClose: () => void;
+}
+
+const PatientRegistrationContent: React.FC<PatientRegistrationContentProps> = ({
+  onClose,
+}) => {
   const [form] = Form.useForm();
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (values: Patient) => {
     try {
-      const { patients_code, date_of_birth, registration_date, ...rest } = values;
-  
+      const { date_of_birth, registration_date, ...rest } = values;
+
       const dataToSend = {
         ...rest,
         date_of_birth: dayjs(date_of_birth).toISOString(),
-        registration_date: dayjs(registration_date).toISOString()
+        registration_date: dayjs(registration_date).toISOString(),
       };
-  
-      const response = await fetchPatientsRegister(dataToSend);
-      console.log("登録された患者情報:", response);
+
+      await dispatch(registerPatient(dataToSend));
       message.success("患者情報が登録されました。");
       form.resetFields();
+      onClose();
+      dispatch(getPatients());
     } catch (error) {
       console.error("登録エラー:", error);
       message.error("患者情報の登録に失敗しました。");
@@ -46,7 +63,6 @@ const PatientRegistrationContent: React.FC = () => {
         }}
       >
         <Row gutter={16}>
-
           {/* 患者名 */}
           <Col span={12}>
             <Form.Item
@@ -88,9 +104,14 @@ const PatientRegistrationContent: React.FC = () => {
             <Form.Item
               name="date_of_birth"
               label="生年月日"
-              rules={[{ required: true, message: "生年月日を入力してください" }]}
+              rules={[
+                { required: true, message: "生年月日を入力してください" },
+              ]}
             >
-              <DatePicker style={{ width: "100%" }} placeholder="生年月日を選択" />
+              <DatePicker
+                style={{ width: "100%" }}
+                placeholder="生年月日を選択"
+              />
             </Form.Item>
           </Col>
 
@@ -115,7 +136,10 @@ const PatientRegistrationContent: React.FC = () => {
               label="登録日"
               rules={[{ required: true, message: "登録日を入力してください" }]}
             >
-              <DatePicker style={{ width: "100%" }} placeholder="登録日を選択" />
+              <DatePicker
+                style={{ width: "100%" }}
+                placeholder="登録日を選択"
+              />
             </Form.Item>
           </Col>
 
@@ -124,7 +148,9 @@ const PatientRegistrationContent: React.FC = () => {
             <Form.Item
               name="treatment_plan"
               label="治療計画"
-              rules={[{ required: true, message: "治療計画を入力してください" }]}
+              rules={[
+                { required: true, message: "治療計画を入力してください" },
+              ]}
             >
               <Input placeholder="例: 週3回のリハビリ" />
             </Form.Item>

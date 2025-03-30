@@ -3,9 +3,10 @@ import { RootState } from "@/store";
 import {
   fetchReservations,
   completedReservation,
-  Reservation,
 } from "@/api/fetchReservation";
 import { sendCompletedReservations } from "@/api/reportApi";
+import { Reservation } from "@/types/reservation";
+
 
 // ✅ Redux Thunk で予約取得
 export const getReservations = createAsyncThunk(

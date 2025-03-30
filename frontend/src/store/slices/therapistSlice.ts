@@ -1,10 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchTherapistList } from "@/api/fetchTherapist";
+import { Therapist } from "@/types/therapists";
 
-interface Therapist {
-  therapist_id: string;
-  username: string;
-}
 
 interface TherapistState {
   therapists: Therapist[];

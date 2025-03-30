@@ -43,11 +43,14 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
 
+
   const buttonData: ButtonData[] = [
     {
       iconSrc: PatientRegistration,
       altText: "患者登録",
-      modalContent: <PatientRegistrationContent />,
+      modalContent: (
+        <PatientRegistrationContent onClose={() => setIsModalVisible(false)} />
+      ) as React.ReactElement,
     },
     {
       iconSrc: PatientIcon,
@@ -78,7 +81,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
 
   const handleIconClick = (
     sectionKey: "patients" | "schedules" | "achievements" | undefined,
-    content: React.ReactNode
+    content: ButtonData["modalContent"]
   ) => {
     if (sectionKey) {
       // セクションを表示
@@ -90,7 +93,11 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
     }
     // セクションキーがない場合はモーダルを表示
     if (content) {
-      setModalContent(content);
+      setModalContent(
+        React.cloneElement(content as React.ReactElement, {
+          onClose: () => setIsModalVisible(false), // モーダルを閉じる関数
+        })
+      );
       setIsModalVisible(true);
     }
   };
