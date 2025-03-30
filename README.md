@@ -5,7 +5,7 @@
 
 ---
 
-## ⚙ユースケース
+## ⚙ ユースケース
 - **療法士（セラピスト）** 向けの患者登録・編集機能
 - リハビリ予約の登録・管理
 - ログイン／ログアウトによる認証付き操作
@@ -32,7 +32,7 @@
 
 ---
 
-## 🔺開発フロー
+## 🔧 開発フロー
 ```
 rehab-management-system/
 ├── frontend/          # React + Vite frontend
@@ -42,51 +42,76 @@ rehab-management-system/
 
 ---
 
-## 🚀 ローカル開発の立上
+## 🚀 ローカル開発の立ち上げ
+以下の手順でローカル環境を構築できます：
+
 ```bash
-# ローカルで立上する場合
+# リポジトリをクローン
 $ git clone https://github.com/yourname/rehab-management-system.git
+
+# ディレクトリに移動
 $ cd rehab-management-system
+
+# 環境変数ファイルをコピー
 $ cp .env.example backend/.env
+
+# Dockerコンテナをビルドして起動
 $ docker-compose up --build
 ```
 
 ---
 
 ## 🌐 EC2 での本番動作
-- AWS EC2 上にアプリを配置
-- Docker Compose で frontend / backend を立ち上げ
-- MongoDB Atlas URI を .env で管理
+AWS EC2 上でアプリを動作させる手順：
 
-```bash
-$ ssh -i ~/.ssh/aws-key.pem ec2-user@xx.xx.xx.xx
-$ cd rehab-management-system
-$ docker-compose up -d
-```
+1. EC2 インスタンスに接続：
+    ```bash
+    $ ssh -i ~/.ssh/aws-key.pem ec2-user@xx.xx.xx.xx
+    ```
+
+2. プロジェクトディレクトリに移動：
+    ```bash
+    $ cd rehab-management-system
+    ```
+
+3. Docker Compose を使用してアプリを起動：
+    ```bash
+    $ docker-compose up -d
+    ```
 
 ---
 
-## 🌟 これからの改善ポイント
-- GitHub Actions で CI/CD 自動化
-- モバイル対応 (React Native 検討)
-- S3 や RDS への移行
-- i18n 対応 (日本語 / 英語)
+## 🌟 今後の改善ポイント
+- **CI/CD 自動化**：GitHub Actions を使用したデプロイの自動化
+- **モバイル対応**：React Native を使用したモバイルアプリの検討
+- **インフラの拡張**：S3 や RDS への移行
+- **多言語対応**：i18n 対応（日本語 / 英語）
 
 ---
 
-## 🚫 注意
-- MongoDB Atlas URI は公開しないよう、.env で分離して管理しています
-- 変更するファイル
-    - docker-compose.yml
-    - /frontend/.env
-        - パブリックIPに書き換える；
+## 🚫 注意事項
+- **MongoDB Atlas URI** は `.env` ファイルで管理し、公開しないように注意してください。
+- 以下のファイルを変更する必要があります：
+    - `docker-compose.yml`
+    - `/frontend/.env`（パブリックIPに書き換え）
 
 ---
 
 ## ✨ 開発者
-- today (https://github.com/yourname)
+- **Toshiki T.** (https://github.com/takahasitoshiki)
+
+---
+## 🌍 デプロイ環境
+本アプリケーションは以下の環境でデプロイされています：
+
+- **URL（本番環境）**: [https://your-deployed-app.com](https://your-deployed-app.com)
+- **ホスティングサービス**: AWS EC2 (Amazon Linux 2023)
+- **データベース**: MongoDB Atlas (Cloud)
+- **インフラ構成**: Docker / Docker Compose
+
+このセクションには、プロジェクトの開発者や貢献者の名前とGitHubリンクを記載します。これにより、他の人が開発者に連絡を取ったり、他のプロジェクトを確認したりすることができます。
 
 ---
 
-ご覧頂きありがとうございます！
+ご覧いただきありがとうございます！
 
