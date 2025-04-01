@@ -23,9 +23,8 @@ jobs:
       - name: Deploy to EC2 via SSH
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /home/ec2-user/rehab-management-system
+            cd /home/ec2-user/rehab-app/rehab-management-system  
             git pull origin main
-            docker compose down
-            docker compose build
-            docker compose up -d
-            EOF
+            docker-compose down                       
+            docker-compose build                      
+            docker-compose up -d                      
