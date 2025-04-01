@@ -11,10 +11,12 @@ dotenv.config(); // 環境変数を読み込む
 const app = express();
 
 // CORS設定
+
 app.use(cors({
-    origin: 'http://localhost:5173', // Reactの開発サーバーURL
-    credentials: true
-}));
+    origin: ['http://54.252.68.195:5173', 'http://localhost:5173'], // 両方許可
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  }));
 
 // MongoDB に接続
 connectDB();
