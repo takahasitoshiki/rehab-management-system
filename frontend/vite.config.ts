@@ -16,5 +16,6 @@ export default defineConfig({
   server: {
     host: true, // ← 外部（Docker外）からアクセスを許可
     port: 5173,
+    allowedHosts: ['toshiki-portfolio.blog']
   },
 });
