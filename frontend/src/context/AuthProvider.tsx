@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AuthContext } from "./AuthContext"; // ✅ 修正: AuthContext.ts から import
+import { AuthContext } from "./AuthContext"; //  修正: AuthContext.ts から import
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

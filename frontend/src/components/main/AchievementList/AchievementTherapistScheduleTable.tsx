@@ -21,7 +21,6 @@ dayjs.extend(isBetween);
 interface AchievementTherapistScheduleTableProps {
   dataSource: TimeSlot[];
   handleRowDoubleClick: (record: TimeSlot) => void;
-  selectedDates: [Dayjs, Dayjs] | null;
   onDropPatient: (record: TimeSlot, patient: Patient, updatedReservations: Reservation[]) => void;
   patients: Patient[];
 }
@@ -29,7 +28,7 @@ interface AchievementTherapistScheduleTableProps {
 const AchievementTherapistScheduleTable: React.FC<
   AchievementTherapistScheduleTableProps
 > = ({ dataSource, handleRowDoubleClick, onDropPatient, patients }) => {
-  const selectedDates = useSelector(selectSelectedDates); // ✅ Redux から selectedDates を取得
+  const selectedDates = useSelector(selectSelectedDates); // Redux から selectedDates を取得
   const loading = useSelector(selectReservationsLoading);
   const therapists = useSelector(
     (state: RootState) => state.therapists.therapists
@@ -44,7 +43,7 @@ const AchievementTherapistScheduleTable: React.FC<
     dispatch(fetchTherapists());
 
     if (completedReservations.length === 0) {
-      dispatch(getCompletedReservations()); // ✅ 既にデータがあれば再取得しない
+      dispatch(getCompletedReservations()); 
     }
   }, [dispatch, completedReservations.length]);
 

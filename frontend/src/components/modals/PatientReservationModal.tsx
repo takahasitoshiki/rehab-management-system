@@ -29,7 +29,7 @@ interface PatientReservationModalProps {
   loading: boolean;
   generateTimeOptions: () => string[];
   droppedPatient?: Patient | null;
-  editingReservation?: Reservation | null; // ✅ 追加
+  editingReservation?: Reservation | null; 
 }
 
 const { Option } = Select;
@@ -57,9 +57,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
 
   useEffect(() => {
     if (editingReservation) {
-      console.log("🆔 編集モード - 予約ID:", editingReservation._id); // ✅ 確認用ログ
-
-      // ✅ 編集モードのとき
+      //編集モードのとき
       form.setFieldsValue({
         therapist_id: editingReservation.therapist_id, // セラピストID
         patientName:
@@ -69,17 +67,17 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
         date: editingReservation.date ? dayjs(editingReservation.date) : null, // 日付
         time: editingReservation.time, // 時間
         remarks: editingReservation.note, // 備考
-        completed: editingReservation.completed, // ✅ 完了ステータス
-        rehabilitation_details: editingReservation.rehabilitation_details, // ✅ リハビリ内容
+        completed: editingReservation.completed, // 完了ステータス
+        rehabilitation_details: editingReservation.rehabilitation_details, // リハビリ内容
       });
     } 
-  }, [editingReservation, form, patients]); // ✅ 依存配列
+  }, [editingReservation, form, patients]); // 依存配列
 
   const onSubmit = async () => {
     try {
       const values = await form.validateFields();
       const requestData: Reservation = {
-        _id: editingReservation?._id || undefined, // ✅ 既存データのIDを保持
+        _id: editingReservation?._id || undefined, 
         patient_code:
           patients.find((p) => p.patients_name === values.patientName)
             ?.patients_code || "",
@@ -87,20 +85,20 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
         date: values.date.format("YYYY-MM-DD"),
         time: values.time,
         note: values.remarks || "",
-        completed: values.completed, // ✅ 完了ステータス
-        rehabilitation_details: values.rehabilitation_details, // ✅ リハビリ内容
+        completed: values.completed, 
+        rehabilitation_details: values.rehabilitation_details,
       };
   
       if (editingReservation) {
-        await updateReservation(requestData); // ✅ 更新処理を実行
+        await updateReservation(requestData); 
         message.success("予約が更新されました");
       } else {
-        await createReservation(requestData); // ✅ 新規作成
+        await createReservation(requestData); 
         message.success("予約が登録されました");
       }
       // 予約リストを全て取り直す
       dispatch(getReservations());
-      dispatch(getCompletedReservations()); // ✅ 完了済み予約も取得
+      dispatch(getCompletedReservations()); 
       
       form.resetFields();
       setIsModalVisible(false);
@@ -112,11 +110,11 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
 
   return (
     <Modal
-      title={editingReservation ? "予約編集" : "患者予約"} // ✅ タイトルを変更
+      title={editingReservation ? "予約編集" : "患者予約"} 
       open={isModalVisible}
       onOk={onSubmit}
       onCancel={() => setIsModalVisible(false)}
-      okText={editingReservation ? "更新" : "予約"} // ✅ ボタンのテキストを変更
+      okText={editingReservation ? "更新" : "予約"} 
       cancelText="キャンセル"
     >
       <Form form={form} layout="vertical">
@@ -184,12 +182,12 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
           <Input placeholder="例：本日のリハビリ内容" />
         </Form.Item>
 
-        {/* ✅ リハビリ内容 */}
+        {/*リハビリ内容 */}
         <Form.Item name="rehabilitation_details" label="リハビリ内容">
           <Input.TextArea placeholder="リハビリの詳細を入力" />
         </Form.Item>
 
-        {/* ✅ 完了ステータス */}
+        {/*完了ステータス */}
         <Form.Item name="completed" label="完了ステータス" initialValue={false}>
           <Select placeholder="完了状態を選択">
             <Option value={false}>未完了</Option>

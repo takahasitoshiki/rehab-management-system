@@ -18,14 +18,14 @@ import { Reservation } from "@/types/reservation";
         throw new Error(`APIエラー: ${response.status}`);
       }
   
-      console.log("✅ 予約登録成功");
+      console.log(" 予約登録成功");
     } catch (error) {
       console.error("❌ 予約登録エラー:", error);
       throw error; // 呼び出し元で処理
     }
   };
 
-  // ✅ 予約取得 API
+  //  予約取得 API
 export const fetchReservations = async (): Promise<Reservation[]> => {
   try {
     console.log("📡 予約データ取得リクエスト");
@@ -48,23 +48,23 @@ export const fetchReservations = async (): Promise<Reservation[]> => {
 
     return data as Reservation[];
   } catch (error) {
-    console.error("❌ 予約データ取得エラー:", error);
+    console.error(" 予約データ取得エラー:", error);
     throw error; // 呼び出し元で処理
   }
 };
 
-// ✅ 予約更新 API
+// 予約更新 API
 export const updateReservation = async (reservation: Reservation): Promise<Reservation> => {
   try {
     if (!reservation._id) {
       throw new Error("予約IDが見つかりません"); // _id がない場合にエラーを投げる
     }
     const response = await fetch(`${VITE_APP_RESERVATION_URL}${reservation._id}`, {
-      method: "PUT", // ✅ PUTメソッドを使用
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(reservation), // ✅ 更新する予約データを送信
+      body: JSON.stringify(reservation), 
     });
 
     if (!response.ok) {
@@ -72,7 +72,6 @@ export const updateReservation = async (reservation: Reservation): Promise<Reser
     }
 
     const updatedReservation = await response.json();
-    console.log("✅ 予約データ更新成功:", updatedReservation);
 
     return updatedReservation as Reservation;
   } catch (error) {
@@ -87,7 +86,7 @@ export const completedReservation = async (): Promise<Reservation[]> => {
   try {
 
     const response = await fetch(`${VITE_APP_RESERVATION_URL}/completed`, {
-      method: "GET", // ✅ PUTメソッドを使用
+      method: "GET", 
       headers: {
         "Content-Type": "application/json",
       },
@@ -98,7 +97,6 @@ export const completedReservation = async (): Promise<Reservation[]> => {
     }
 
     const completedReservation = await response.json();
-    console.log("✅ 完了した予約のみを取得成功:", completedReservation);
 
     return completedReservation as Reservation[];
   } catch (error) {

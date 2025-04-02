@@ -116,7 +116,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
     if (dates && dates[0] && dates[1]) {
       dispatch(
         setDateRange({
-          startDate: dates[0].format("YYYY-MM-DD"), // ✅ 文字列に変換して保存
+          startDate: dates[0].format("YYYY-MM-DD"), 
           endDate: dates[1].format("YYYY-MM-DD"),
         })
       );
@@ -158,7 +158,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
         <label htmlFor="period">期間</label>
         <RangePicker
           id="period"
-          onChange={handleDateChange} // ✅ onChange に修正
+          onChange={handleDateChange} 
           format="YYYY-MM-DD"
           value={[startDate, endDate]} // Reduxの値を反映
           placeholder={["開始日", "終了日"]}

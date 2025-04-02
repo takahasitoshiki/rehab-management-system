@@ -12,18 +12,18 @@ const AppRoutes: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* ✅ デフォルトページを /login にリダイレクト */}
+        {/*  デフォルトページを /login にリダイレクト */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* ✅ ログインルート (認証不要) */}
+        {/*  ログインルート (認証不要) */}
         <Route path="/login" element={<Login />} />
 
-        {/* ✅ 認証が必要なページは ProtectedRoute 内に定義 */}
+        {/*  認証が必要なページは ProtectedRoute 内に定義 */}
         <Route element={<ProtectedRoute />}>
           <Route path="/scheduling" element={<Scheduling />} />
         </Route>
 
-        {/* ✅ 存在しないページは /login にリダイレクト */}
+        {/*  存在しないページは /login にリダイレクト */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

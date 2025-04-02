@@ -4,11 +4,11 @@ import LoginIcon from "@/assets/icon/Login.png";
 import { Form, Input, Button, message } from "antd";
 import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/useAuth"; // ✅ useAuth を追加
+import { useAuth } from "@/context/useAuth"; 
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login: setAuth } = useAuth(); // ✅ 認証状態を更新する
+  const { login: setAuth } = useAuth();
 
   const onFinish = async (values: { username: string; password: string }) => {
     try {

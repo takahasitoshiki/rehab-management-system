@@ -22,7 +22,6 @@ dayjs.extend(isBetween);
 interface TherapistScheduleTableProps {
   dataSource: TimeSlot[];
   handleRowDoubleClick: (record: TimeSlot) => void;
-  selectedDates: [Dayjs, Dayjs] | null;
   onDropPatient: (record: TimeSlot, patient: Patient) => void;
   patients: Patient[];
 }
@@ -33,7 +32,7 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
   onDropPatient,
   patients,
 }) => {
-  const selectedDates = useSelector(selectSelectedDates); // ✅ Redux から selectedDates を取得
+  const selectedDates = useSelector(selectSelectedDates); 
   const reservations = useSelector(selectReservations);
   const loading = useSelector(selectReservationsLoading);
   const therapists = useSelector(

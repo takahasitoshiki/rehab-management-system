@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import dayjs from "dayjs";
-import { RootState } from "@/store/index"; // ✅ パスを確認
+import { RootState } from "@/store/index"; 
 
-// ✅ `startDate` 〜 `endDate` の範囲の日付リストを生成する関数
+//  `startDate` 〜 `endDate` の範囲の日付リストを生成する関数
 const getDateRange = (start: string, end: string): string[] => {
   const dates: string[] = [];
   let currentDate = dayjs(start);
@@ -37,13 +37,13 @@ const dateSlice = createSlice({
 
 export const { setDateRange } = dateSlice.actions;
 
-// ✅ Redux の `startDate` と `endDate` を取得するセレクター
+//  Redux の `startDate` と `endDate` を取得するセレクター
 export const selectDateRange = (state: RootState) => ({
-  startDate: dayjs(state.date.startDate), // ✅ 文字列 → dayjs に変換
+  startDate: dayjs(state.date.startDate), 
   endDate: dayjs(state.date.endDate),
 });
 
-// ✅ `selectedDates` を取得するセレクター
+//  `selectedDates` を取得するセレクター
 export const selectSelectedDates = (state: RootState) =>
   state.date.selectedDates.map((date: string) => dayjs(date));
 

@@ -22,7 +22,7 @@ const PatientList: React.FC = () => {
     dispatch(getPatients());
   }, [dispatch]);
 
-  // ✅ ドラッグ可能な行コンポーネント
+  //  ドラッグ可能な行コンポーネント
   const DraggableRow: React.FC<{ children?: React.ReactNode; "data-row-key"?: string; patients: Patient[] }> = ({
     children,
     "data-row-key": dataRowKey,
@@ -37,7 +37,7 @@ const PatientList: React.FC = () => {
     const [{ isDragging }, drag] = useDrag({
       type: "PATIENT",
       item: () => {
-        return record ? { patient: record } : { patient: null }; // ✅ `record` が null でも `useDrag` を実行
+        return record ? { patient: record } : { patient: null }; 
       },
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
@@ -47,10 +47,10 @@ const PatientList: React.FC = () => {
     return (
       <tr
         {...props}
-        ref={record ? drag : undefined} // ✅ `record` があるときだけ `drag` を適用
+        ref={record ? drag : undefined} 
         style={{
           opacity: isDragging ? 0.5 : 1,
-          cursor: record ? "move" : "default", // ✅ `record` がない場合はカーソルを変更
+          cursor: record ? "move" : "default", 
         }}
       >
         {children}
@@ -73,7 +73,7 @@ const PatientList: React.FC = () => {
           components={{
             body: {
               row: (props: React.HTMLAttributes<HTMLTableRowElement>) => {
-                return <DraggableRow {...props} patients={patients} />; // ✅ `patients` を渡す
+                return <DraggableRow {...props} patients={patients} />; 
               },
             },
           }}

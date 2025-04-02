@@ -8,8 +8,8 @@ export interface TimeSlot {
   patient: string | null;
   date?: string; 
   therapist_id:string| null;
-  reservations?: Reservation[]; // 配列を追加
-  rowSpan?: number; // ✅ 追加
+  reservations?: Reservation[]; 
+  rowSpan?: number; 
   hourRowSpan?: number;
   minuteRowSpan?: number;
 }

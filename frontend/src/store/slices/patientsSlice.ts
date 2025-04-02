@@ -8,24 +8,24 @@ interface PatientsState {
   error: string | null;
 }
 
-// ✅ Redux Thunk で患者情報を取得
+//  Redux Thunk で患者情報を取得
 export const getPatients = createAsyncThunk(
   "patients/fetchPatients",
   async (_, { rejectWithValue }) => {
     try {
-      return await fetchPatientsList(); // ✅ 患者情報を取得
+      return await fetchPatientsList(); //  患者情報を取得
     } catch (error) {
       console.error(error);
       return rejectWithValue("患者情報の取得に失敗しました。");
     }
   }
 );
-// ✅ Redux Thunk で患者情報を登録
+// Redux Thunk で患者情報を登録
 export const registerPatient = createAsyncThunk(
   "patients/registerPatient",
   async (patientData: Patient, { rejectWithValue }) => {
     try {
-      return await fetchPatientsRegister(patientData); // ✅ 患者情報を登録
+      return await fetchPatientsRegister(patientData); //  患者情報を登録
     } catch (error) {
       console.error(error);
       return rejectWithValue("患者情報の登録に失敗しました。");

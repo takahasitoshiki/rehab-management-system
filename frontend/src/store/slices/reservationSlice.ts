@@ -8,12 +8,12 @@ import { sendCompletedReservations } from "@/api/reportApi";
 import { Reservation } from "@/types/reservation";
 
 
-// ✅ Redux Thunk で予約取得
+//  Redux Thunk で予約取得
 export const getReservations = createAsyncThunk(
   "reservations/fetchReservations",
   async (_, { rejectWithValue }) => {
     try {
-      return await fetchReservations(); // ✅ 予約データ取得
+      return await fetchReservations(); //  予約データ取得
     } catch (error) {
       console.error(error);
       return rejectWithValue("予約データの取得に失敗しました。");
@@ -21,12 +21,12 @@ export const getReservations = createAsyncThunk(
   }
 );
 
-// ✅ 完了済みの予約のみを取得
+//  完了済みの予約のみを取得
 export const getCompletedReservations = createAsyncThunk(
   "reservations/fetchCompletedReservations",
   async (_, { rejectWithValue }) => {
     try {
-      return await completedReservation(); // ✅ 完了済みの予約データを取得
+      return await completedReservation(); //  完了済みの予約データを取得
     } catch (error) {
       console.error(error);
       return rejectWithValue("完了済み予約データの取得に失敗しました。");
@@ -83,7 +83,7 @@ const reservationSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // ✅ 完了済み予約取得
+      // 完了済み予約取得
       .addCase(getCompletedReservations.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -97,7 +97,7 @@ const reservationSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // ✅ 送信成功後に reported = true を付ける
+      // 送信成功後に reported = true を付ける
       .addCase(reportCompletedReservations.fulfilled, (state, action) => {
         const sentIds = action.payload;
         state.completedReservations = state.completedReservations.map((res) => {
@@ -112,7 +112,7 @@ const reservationSlice = createSlice({
 
 export default reservationSlice.reducer;
 
-// ✅ セレクタ関数を作成
+//  セレクタ関数を作成
 export const selectReservations = (state: RootState) =>
   state.reservations.reservations;
 export const selectReservationsLoading = (state: RootState) =>

@@ -9,12 +9,12 @@ const ProtectedRoute: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      login(); // ✅ ログイン状態を更新
+      login(); //  ログイン状態を更新
     }
-    setTimeout(() => setIsAuthChecked(true), 50); // ✅ login() の更新を確実に反映
-  }, [login]); // ✅ 依存配列に login のみを入れる
+    setTimeout(() => setIsAuthChecked(true), 50); //  login() の更新を確実に反映
+  }, [login]); //  依存配列に login のみを入れる
 
-  if (!isAuthChecked) return null; // ✅ 認証チェックが完了するまで画面を非表示にする
+  if (!isAuthChecked) return null; //  認証チェックが完了するまで画面を非表示にする
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };

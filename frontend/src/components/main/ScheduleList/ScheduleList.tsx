@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots, TimeSlot } from "@/utils/timeSlotGenerator";
-import dayjs, {  } from "dayjs";
+import dayjs from "dayjs";
 import TherapistScheduleTable from "@/components/main/ScheduleList/TherapistScheduleTable";
 import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
@@ -10,12 +10,11 @@ import { Patient } from "@/types/patient";
 import { Reservation } from "@/types/reservation";
 
 interface ScheduleListProps {
-  // selectedDates: [Dayjs, Dayjs];
   onDropPatient: (
     record: TimeSlot,
     patient: Patient,
     updatedReservations: Reservation[]
-  ) => void; // ✅ 修正
+  ) => void;
   dataSource: TimeSlot[];
   setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>;
 }
@@ -59,17 +58,17 @@ const ScheduleList: React.FC<ScheduleListProps> = () => {
     }
     return times;
   };
-  // ✅ モーダルを開く共通関数
+  //  モーダルを開く共通関数
   const openReservationModal = (record: TimeSlot, patient?: Patient) => {
     form.setFieldsValue({
       time: `${record.hour}:${record.minute}`,
-      date: record.date ? dayjs(record.date) : dayjs(), // ✅ 正しい日付をセット
-      therapist_id: record.therapist_id, // ✅ therapist_id をセット
+      date: record.date ? dayjs(record.date) : dayjs(),
+      therapist_id: record.therapist_id,
     });
     if (patient) {
-      setDroppedPatient(patient); // ✅ 患者情報がある場合のみセット
+      setDroppedPatient(patient);
     } else {
-      setDroppedPatient(null); // ✅ クリック時は患者情報なし
+      setDroppedPatient(null);
     }
 
     setIsModalVisible(true);
@@ -77,27 +76,23 @@ const ScheduleList: React.FC<ScheduleListProps> = () => {
 
   const handleRowDoubleClick = (record: TimeSlot) => {
     if (record.reservations?.length) {
-      // ✅ undefined の場合を考慮
+      //  undefined の場合を考慮
       setEditingReservation(record.reservations[0]);
       openReservationModal(record);
-      console.dir("クリックした項目:"+JSON.stringify(record, null, 2));
+      console.dir("クリックした項目:" + JSON.stringify(record, null, 2));
     }
   };
 
-  // ✅ 患者をドロップした時の処理
+  //  患者をドロップした時の処理
   const onDropPatient = (record: TimeSlot, patient: Patient) => {
-    console.log("🟢 onDropPatient 呼び出し - record:", record);
-    console.log("🟢 onDropPatient 呼び出し - patient:", patient);
-    console.log("🟢 onDropPatient - record.therapist_id:", record.therapist_id);
-
     setDataSource((prevData) =>
       prevData.map((slot) =>
         slot.key === record.key
           ? {
               ...slot,
               patient: patient.patients_name,
-              date: record.date ?? dayjs().format("YYYY-MM-DD"), // ✅ `date` をセット
-              therapist_id: record.therapist_id, // ✅ therapist_id を維持
+              date: record.date ?? dayjs().format("YYYY-MM-DD"),
+              therapist_id: record.therapist_id,
             }
           : slot
       )
@@ -126,7 +121,7 @@ const ScheduleList: React.FC<ScheduleListProps> = () => {
         dataSource={dataSource}
         handleRowDoubleClick={handleRowDoubleClick}
         onDropPatient={onDropPatient}
-        patients={patients} // ✅ 追加
+        patients={patients}
       />
 
       {/* 予約ダイアログ */}
@@ -137,7 +132,7 @@ const ScheduleList: React.FC<ScheduleListProps> = () => {
         patients={patients}
         loading={loading}
         generateTimeOptions={generateTimeOptions}
-        editingReservation={editingReservation} // ✅ 編集対象の予約を渡す
+        editingReservation={editingReservation}
       />
     </SectionWrapper>
   );
