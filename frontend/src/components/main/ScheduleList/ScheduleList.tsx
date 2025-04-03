@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Form, message } from "antd";
+import { Form } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots, TimeSlot } from "@/utils/timeSlotGenerator";
 import dayjs from "dayjs";
 import TherapistScheduleTable from "@/components/main/ScheduleList/TherapistScheduleTable";
-import { fetchPatientsList } from "@/api/fetchPatients";
+// import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
 import { Patient } from "@/types/patient";
 import { Reservation } from "@/types/reservation";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { getPatients } from "@/store/slices/patientsSlice";
 
 interface ScheduleListProps {
   onDropPatient: (
@@ -22,29 +24,34 @@ interface ScheduleListProps {
 const ScheduleList: React.FC<ScheduleListProps> = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { patients, loading } = useAppSelector((state) => state.patients);
+  const dispatch = useAppDispatch();  
+  // const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState<TimeSlot[]>(generateTimeSlots());
   const [droppedPatient, setDroppedPatient] = useState<Patient | null>(null);
   const [editingReservation, setEditingReservation] =
     useState<Reservation | null>(null);
 
-  useEffect(() => {
-    const loadPatients = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchPatientsList();
-        if (!Array.isArray(data)) throw new Error("データが配列ではありません");
-        setPatients(data);
-      } catch (error) {
-        console.error("エラー:", error);
-        message.error("患者情報の取得に失敗しました。");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadPatients();
-  }, []);
+  // useEffect(() => {
+  //   const loadPatients = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const data = await fetchPatientsList();
+  //       if (!Array.isArray(data)) throw new Error("データが配列ではありません");
+  //       setPatients(data);
+  //     } catch (error) {
+  //       console.error("エラー:", error);
+  //       message.error("患者情報の取得に失敗しました。");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   loadPatients();
+  // }, []);
+
+    useEffect(() => {
+      dispatch(getPatients());
+    }, [dispatch]);
 
   const generateTimeOptions = () => {
     const times: string[] = [];

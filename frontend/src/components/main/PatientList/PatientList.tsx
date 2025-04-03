@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { Table, Spin } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
-// import { fetchPatientsList } from "@/api/fetchPatients";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { getPatients } from "@/store/slices/patientsSlice";
 import { useDrag } from "react-dnd";
