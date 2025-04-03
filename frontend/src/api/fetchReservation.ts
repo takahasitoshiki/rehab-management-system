@@ -20,7 +20,7 @@ import { Reservation } from "@/types/reservation";
   
       console.log(" 予約登録成功");
     } catch (error) {
-      console.error("❌ 予約登録エラー:", error);
+      console.error(" 予約登録エラー:", error);
       throw error; // 呼び出し元で処理
     }
   };
@@ -75,7 +75,7 @@ export const updateReservation = async (reservation: Reservation): Promise<Reser
 
     return updatedReservation as Reservation;
   } catch (error) {
-    console.error("❌ 予約データ更新エラー:", error);
+    console.error(" 予約データ更新エラー:", error);
     throw error; // 呼び出し元で処理
   }
 };
@@ -100,7 +100,7 @@ export const completedReservation = async (): Promise<Reservation[]> => {
 
     return completedReservation as Reservation[];
   } catch (error) {
-    console.error("❌ 予約データ取得エラー:", error);
+    console.error(" 予約データ取得エラー:", error);
     throw error; // 呼び出し元で処理
   }
 };

@@ -12,7 +12,7 @@ const LogoutButton: React.FC = () => {
       message.success("ログアウトしました。");
       navigate("/login"); // ログインページにリダイレクト
     } catch (error) {
-      console.error("❌ ログアウトに失敗しました:", error);
+      console.error(" ログアウトに失敗しました:", error);
       message.error("ログアウトに失敗しました。");
     }
   };
