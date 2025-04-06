@@ -146,7 +146,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
         >
           <Select placeholder="患者名" loading={loading}>
             {patients.map((patient) => (
-              <Option key={patient.patients_code} value={patient.patients_name}>
+              <Option key={patient.patients_code} value={patient.patients_code}>
                 {patient.patients_name}
               </Option>
             ))}

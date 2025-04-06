@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Form, message } from "antd";
 import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots, TimeSlot } from "@/utils/timeSlotGenerator";
-import dayjs, {  } from "dayjs";
+import dayjs from "dayjs";
 import AchievementTherapistScheduleTable from "@/components/main/AchievementList/AchievementTherapistScheduleTable";
 import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
 import { Patient } from "@/types/patient";
 import { Reservation } from "@/types/reservation";
 
-interface ScheduleListProps {
+interface AchievementListProps {
   onDropPatient: (
     record: TimeSlot,
     patient: Patient,
@@ -19,7 +19,7 @@ interface ScheduleListProps {
   setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>;
 }
 
-const AchievementList: React.FC<ScheduleListProps> = () => {
+const AchievementList: React.FC<AchievementListProps> = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -79,7 +79,6 @@ const AchievementList: React.FC<ScheduleListProps> = () => {
       // undefined の場合を考慮
       setEditingReservation(record.reservations[0]);
       openReservationModal(record);
-      console.dir("クリックした項目:"+JSON.stringify(record, null, 2));
     }
   };
 

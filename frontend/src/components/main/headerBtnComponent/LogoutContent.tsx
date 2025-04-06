@@ -19,7 +19,7 @@ const LogoutButton: React.FC = () => {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <p>本当にログアウトしますか？</p>
+      <p role="alert">本当にログアウトしますか？</p>
       <Space>
         <Button danger type="primary" onClick={handleLogout}>
           ログアウト

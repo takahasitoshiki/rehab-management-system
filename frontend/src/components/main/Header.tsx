@@ -103,7 +103,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
   };
 
   const handleOk = () => {
-    setIsModalVisible(false); // モーダルを開く
+    setIsModalVisible(false); 
   };
 
   const handleCancel = () => {

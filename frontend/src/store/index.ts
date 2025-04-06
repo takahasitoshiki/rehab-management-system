@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import logger from "redux-logger"; 
+// import logger from "redux-logger"; 
 import therapistReducer from "./slices/therapistSlice";
 import reservationReducer from "./slices/reservationSlice"; 
 import dateReducer from "./slices/dateSlice"; 
@@ -13,7 +13,7 @@ export const store = configureStore({
     date:dateReducer,
     patients: patientsReducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger), 
+  // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger), 
 });
 
 export type RootState = ReturnType<typeof store.getState>;

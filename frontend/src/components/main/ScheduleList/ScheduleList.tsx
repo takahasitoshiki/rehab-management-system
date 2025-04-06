@@ -26,28 +26,10 @@ const ScheduleList: React.FC<ScheduleListProps> = () => {
   const [form] = Form.useForm();
   const { patients, loading } = useAppSelector((state) => state.patients);
   const dispatch = useAppDispatch();  
-  // const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState<TimeSlot[]>(generateTimeSlots());
   const [droppedPatient, setDroppedPatient] = useState<Patient | null>(null);
   const [editingReservation, setEditingReservation] =
     useState<Reservation | null>(null);
-
-  // useEffect(() => {
-  //   const loadPatients = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const data = await fetchPatientsList();
-  //       if (!Array.isArray(data)) throw new Error("データが配列ではありません");
-  //       setPatients(data);
-  //     } catch (error) {
-  //       console.error("エラー:", error);
-  //       message.error("患者情報の取得に失敗しました。");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   loadPatients();
-  // }, []);
 
     useEffect(() => {
       dispatch(getPatients());
