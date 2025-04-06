@@ -82,10 +82,10 @@ AWS EC2 上でアプリを動作させる手順：
 ---
 
 ## 🌟 今後の改善ポイント
-- **CI/CD 自動化**：GitHub Actions を使用したデプロイの自動化
 - **モバイル対応**：React Native を使用したモバイルアプリの検討
 - **インフラの拡張**：S3 や RDS への移行
 - **多言語対応**：i18n 対応（日本語 / 英語）
+- **アルタイム通信**：web socketを使用したリアルタイム通信
 
 ---
 
@@ -104,7 +104,7 @@ AWS EC2 上でアプリを動作させる手順：
 ## 🌍 デプロイ環境
 本アプリケーションは以下の環境でデプロイされています：
 
-- **URL（本番環境）**: [https://your-deployed-app.com](https://your-deployed-app.com)
+- **URL（本番環境）**: [https://toshiki-portfolio.blog/login](https://toshiki-portfolio.blog/login)
 - **ホスティングサービス**: AWS EC2 (Amazon Linux 2023)
 - **データベース**: MongoDB Atlas (Cloud)
 - **インフラ構成**: Docker / Docker Compose
