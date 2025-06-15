@@ -1,19 +1,22 @@
 {
   "compilerOptions": {
     "jsx": "react-jsx", // JSX サポートを有効化（React 17以降向け）
-    "target": "ES2022",                   // コンパイル対象のJavaScriptバージョン
-    "module": "ESNext",                   // モジュールシステム
-    "strict": true,                       // 厳密な型チェックを有効
-    "esModuleInterop": true,              // ESモジュールとの互換性を有効
-    "skipLibCheck": true,                 // 型定義ファイルのチェックをスキップ
+    "target": "ES2022", // コンパイル対象のJavaScriptバージョン
+    "module": "ESNext", // モジュールシステム
+    "strict": true, // 厳密な型チェックを有効
+    "esModuleInterop": true, // ESモジュールとの互換性を有効
+    "skipLibCheck": true, // 型定義ファイルのチェックをスキップ
     "forceConsistentCasingInFileNames": true, // ファイル名の大文字小文字を強制
-    "moduleResolution": "node",           // モジュール解決戦略
-    "baseUrl": ".",                       // エイリアスの基準ディレクトリ
-    "paths": {                            // エイリアス設定
+    "moduleResolution": "node", // モジュール解決戦略
+    "baseUrl": ".", // エイリアスの基準ディレクトリ
+    "outDir": "./dist", // ここで出力先を指定
+    "rootDir": "./src", // ソースのルート
+    "paths": {
+      // エイリアス設定
       "@/*": ["src/*"]
     },
     "typeRoots": ["src/types", "node_modules/@types"] // 型定義ファイルの場所
   },
-  "include": ["src"],                     // 型チェック対象のファイル
-  "exclude": ["node_modules"]             // 型チェック除外のファイル
+  "include": ["src"], // 型チェック対象のファイル
+  "exclude": ["node_modules"] // 型チェック除外のファイル
 }
