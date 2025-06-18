@@ -111,7 +111,6 @@ const AchievementList: React.FC<AchievementListProps> = () => {
         patientName: droppedPatient.patients_name,
       });
     }
-    console.log("🛠 Generated Time Slots:", generateTimeSlots());
   }, [isModalVisible, droppedPatient, dataSource, form]);
 
   return (

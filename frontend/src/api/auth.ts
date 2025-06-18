@@ -27,7 +27,9 @@ export const logout = async () => {
       }
     );
   } catch (error) {
-    console.error(" ログアウトに失敗しました:", error);
+    console.error("ログアウトに失敗しました:", error);
     throw error;
+  } finally {
+    localStorage.removeItem("token"); // ローカルストレージからトークンを削除
   }
 };

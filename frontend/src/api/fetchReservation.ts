@@ -28,7 +28,6 @@ import { Reservation } from "@/types/reservation";
   //  予約取得 API
 export const fetchReservations = async (): Promise<Reservation[]> => {
   try {
-    console.log("📡 予約データ取得リクエスト");
 
     const response = await fetch(`${VITE_APP_RESERVATION_URL}/search`, {
       method: "GET",
