@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import Login from "@/pages/Login/Login";
 import Scheduling from "@/pages/Main/Main";
+import SignUp from "@/pages/SignUp/SignUp";
 import ProtectedRoute from "@/routes/ProtectedRoute"
 
 const AppRoutes: React.FC = () => {
@@ -17,6 +18,9 @@ const AppRoutes: React.FC = () => {
 
         {/*  ログインルート (認証不要) */}
         <Route path="/login" element={<Login />} />
+
+        {/*  新規登録ルート (認証不要) */}
+        <Route path="/signup" element={<SignUp />} />
 
         {/*  認証が必要なページは ProtectedRoute 内に定義 */}
         <Route element={<ProtectedRoute />}>
