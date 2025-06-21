@@ -34,6 +34,5 @@ export const generateTimeSlots = (
     }
   }
 
-  console.log("Generated time slots:", timeSlots);
   return timeSlots;
 };
