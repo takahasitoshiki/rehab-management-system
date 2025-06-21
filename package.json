@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "express": "^4.21.2",
-    "redux-logger": "^3.0.6"
+    "redux-logger": "^3.0.6",
+    "uuid": "^11.1.0"
   }
 }
