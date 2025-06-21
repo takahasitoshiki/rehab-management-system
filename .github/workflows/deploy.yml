@@ -1,30 +1,72 @@
-name: Deploy to EC2
+name: Deploy Full Stack Application to EC2
 
 on:
   push:
     branches:
-      - main
+      - main # mainブランチへのプッシュ時にこのワークフローが実行されます
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # GitHub ActionsのVMはUbuntu最新版を使用
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3 # リポジトリのコードをVMにチェックアウト
 
-      - name: Set up SSH key
+      # --- フロントエンドのビルドステップ ---
+      # フロントエンドのnpm installとnpm run buildをGitHub ActionsのVM上で行います
+      - name: Setup Node.js for Frontend Build
+        uses: actions/setup-node@v4 # Node.js環境をセットアップ
+        with:
+          node-version: '18' # あなたのフロントエンドプロジェクトで使用しているNode.jsのバージョンに合わせてください
+
+      - name: Install Frontend Dependencies
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_KEY_B64 }}" | base64 -d > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          cd frontend # frontendディレクトリへ移動
+          npm install # 依存関係をインストール
 
-      - name: Deploy to EC2 via SSH
+      - name: Build Frontend
+        run: |
+          cd frontend # frontendディレクトリへ移動
+          npm run build # Vite (または他のフレームワーク) で本番用ビルドを実行し、dist/ を生成します
+      # ------------------------------------
+
+      - name: Set up SSH key # EC2インスタンスへのSSH接続に必要な秘密鍵を設定
+        run: |
+          mkdir -p ~/.ssh # .sshディレクトリが存在しない場合は作成
+          echo "${{ secrets.EC2_KEY_B64 }}" | base64 -d > ~/.ssh/id_rsa # Base64デコードされた秘密鍵をファイルに保存
+          chmod 600 ~/.ssh/id_rsa # 秘密鍵のパーミッションを設定 (必須)
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts # SSHホストのフィンガープリントをknown_hostsに追加 (セキュリティ強化)
+
+      - name: Deploy Frontend to EC2 via SCP # ★ビルドされたフロントエンドファイルをEC2に転送
+        uses: appleboy/scp-action@v0.1.7 # SCP (Secure Copy Protocol) を使ってファイルを安全に転送するGitHub Action
+        with:
+          host: ${{ secrets.EC2_HOST }} # GitHub Secretsに保存したEC2のホスト名 (IPアドレスまたはDNS名)
+          username: ${{ secrets.EC2_USER }} # GitHub Secretsに保存したEC2のユーザー名 (例: ec2-user)
+          key: ~/.ssh/id_rsa # 先ほど設定したSSH秘密鍵のパス
+          source: "frontend/dist/" # 転送元ディレクトリ: GitHub ActionsのVM上の `frontend/dist` ディレクトリの中身
+          # 転送先ディレクトリ: Nginxのroot設定が `/home/ec2-user/rehab-app/rehab-management-system/frontend/dist` であるため、
+          # その親ディレクトリまでを指定し、sourceの `dist/` の中身が `frontend/dist` の中にコピーされるようにします。
+          target: "/home/ec2-user/rehab-app/rehab-management-system/frontend/"
+
+      - name: Deploy Backend and Reload Nginx via SSH # ★バックエンドの更新とNginxのリロードをSSH経由で実行
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /home/ec2-user/rehab-app/rehab-management-system  
+            # サーバー上のプロジェクトディレクトリへ移動
+            cd /home/ec2-user/rehab-app/rehab-management-system
+
+            # 最新のコードをGitリポジトリからプル (バックエンドの修正を反映するため)
             git pull origin main
-            docker-compose down                       
-            docker-compose build                      
-            docker-compose up -d                      
+
+            # 既存のDockerコンテナを停止し、削除
+            docker-compose down
+
+            # Dockerイメージを再ビルド (バックエンドのコード変更を確実に反映するため --no-cache が重要)
+            docker-compose build --no-cache
+
+            # 新しいDockerコンテナをバックグラウンドで起動
+            docker-compose up -d
+
+            # Nginxをリロードして、新しいフロントエンドファイルを読み込ませる
+            sudo systemctl reload nginx
+          EOF
