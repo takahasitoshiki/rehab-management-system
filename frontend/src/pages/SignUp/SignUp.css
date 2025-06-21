@@ -1,0 +1,39 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #cfdad9;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0f7fa;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+
+.ant-form-item {
+  margin-bottom: 16px;
+}
+
+.ant-btn-primary {
+  background-color: #00bcd4;
+  border-color: #00bcd4;
+}
+
+.ant-btn-primary:hover {
+  background-color: #0097a7;
+  border-color: #0097a7;
+}

@@ -26,7 +26,6 @@ interface MainContentProps {
   setMaximizedSection: React.Dispatch<
     React.SetStateAction<"patients" | "schedules" | "achievements" | null>
   >;
-  // selectedDates: [Dayjs, Dayjs];
 }
 
 const MainContent: React.FC<MainContentProps> = ({

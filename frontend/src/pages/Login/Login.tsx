@@ -4,7 +4,7 @@ import LoginIcon from "@/assets/icon/Login.png";
 import { Form, Input, Button, message } from "antd";
 import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/useAuth"; 
+import { useAuth } from "@/context/useAuth";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -65,6 +65,14 @@ const Login: React.FC = () => {
         <Form.Item style={{ marginTop: "30px" }}>
           <Button type="primary" htmlType="submit" block>
             LOGIN
+          </Button>
+          <Button
+            type="default"
+            block
+            style={{ marginTop: "10px" }}
+            onClick={() => navigate("/signup")}
+          >
+            SIGNUP
           </Button>
         </Form.Item>
       </Form>
