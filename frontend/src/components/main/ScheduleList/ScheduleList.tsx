@@ -97,7 +97,7 @@ const ScheduleList: React.FC<ScheduleListProps> = () => {
         droppedPatient.patients_name
       );
       form.setFieldsValue({
-        patientName: droppedPatient.patients_name,
+        patient_code: droppedPatient.patients_code,
       });
     }
   }, [isModalVisible, droppedPatient, dataSource, form]);

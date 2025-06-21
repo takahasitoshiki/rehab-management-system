@@ -4,7 +4,7 @@ import { Reservation } from "@/types/reservation";
   
   export const createReservation = async (data: Reservation): Promise<void> => {
     try {
-      console.log("📡 API 送信データ:", data);
+      console.log("API 送信データ:", data);
   
       const response = await fetch( `${VITE_APP_RESERVATION_URL}`, {
         method: "POST",

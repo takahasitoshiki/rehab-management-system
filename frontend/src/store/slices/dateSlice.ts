@@ -49,14 +49,11 @@ export const selectDateRange = createSelector(
   })
 );
 
-
-//  `selectedDates` を取得するセレクター
-// export const selectSelectedDates = (state: RootState) =>
-//   state.date.selectedDates.map((date: string) => dayjs(date));
-
-// export default dateSlice.reducer;
+//  Redux の `selectedDates` を取得するセレクター
+//  https://www.notion.so/createSelector-216fdcf6313680589b1ce26e27daafb8?source=copy_link
 
 export const selectSelectedDates = createSelector(
   (state: RootState) => state.date.selectedDates,
   (selectedDates) => selectedDates.map((date: string) => dayjs(date))
 )
+export default dateSlice.reducer;

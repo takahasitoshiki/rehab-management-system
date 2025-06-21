@@ -60,10 +60,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
       //編集モードのとき
       form.setFieldsValue({
         therapist_id: editingReservation.therapist_id, // セラピストID
-        patientName:
-          patients.find(
-            (p) => p.patients_code === editingReservation.patient_code
-          )?.patients_name || "", // 患者名をセット
+        patientName:editingReservation.patient_code, // 患者名
         date: editingReservation.date ? dayjs(editingReservation.date) : null, // 日付
         time: editingReservation.time, // 時間
         remarks: editingReservation.note, // 備考
@@ -78,9 +75,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
       const values = await form.validateFields();
       const requestData: Reservation = {
         _id: editingReservation?._id || undefined, 
-        patient_code:
-          patients.find((p) => p.patients_name === values.patientName)
-            ?.patients_code || "",
+        patient_code:values.patient_code, 
         therapist_id: values.therapist_id,
         date: values.date.format("YYYY-MM-DD"),
         time: values.time,
@@ -132,7 +127,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
                 key={therapist.therapist_id}
                 value={therapist.therapist_id}
               >
-                {therapist.username} {/* ここは適切な名前プロパティに変更 */}
+                {therapist.username} 
               </Option>
             ))}
           </Select>
@@ -140,9 +135,9 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
 
         {/* 患者名 */}
         <Form.Item
-          name="patientName"
+          name="patient_code"
           label="患者名"
-          rules={[{ required: true, message: "患者名を入力してください" }]}
+          rules={[{ required: true, message: "患者名を選択してください" }]}
         >
           <Select placeholder="患者名" loading={loading}>
             {patients.map((patient) => (
