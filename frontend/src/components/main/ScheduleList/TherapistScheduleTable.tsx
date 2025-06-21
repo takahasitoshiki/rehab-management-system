@@ -114,6 +114,10 @@ const TherapistScheduleTable: React.FC<TherapistScheduleTableProps> = ({
       }
     });
 
+    console.log(
+      `Therapist ${therapistId} schedule for ${date.format("YYYY-MM-DD")}:`,
+      schedule
+    );
     return groupTimeSlots(schedule);
   };
 

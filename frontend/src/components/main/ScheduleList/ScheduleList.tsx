@@ -4,7 +4,6 @@ import SectionWrapper from "@/styles/SectionWrapper";
 import { generateTimeSlots, TimeSlot } from "@/utils/timeSlotGenerator";
 import dayjs from "dayjs";
 import TherapistScheduleTable from "@/components/main/ScheduleList/TherapistScheduleTable";
-// import { fetchPatientsList } from "@/api/fetchPatients";
 import PatientReservationModal from "@/components/modals/PatientReservationModal";
 import { Patient } from "@/types/patient";
 import { Reservation } from "@/types/reservation";
@@ -20,20 +19,21 @@ interface ScheduleListProps {
   dataSource: TimeSlot[];
   setDataSource: React.Dispatch<React.SetStateAction<TimeSlot[]>>;
 }
+type ModalMode = "create" | "edit";
 
 const ScheduleList: React.FC<ScheduleListProps> = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const { patients, loading } = useAppSelector((state) => state.patients);
-  const dispatch = useAppDispatch();  
+  const dispatch = useAppDispatch();
   const [dataSource, setDataSource] = useState<TimeSlot[]>(generateTimeSlots());
   const [droppedPatient, setDroppedPatient] = useState<Patient | null>(null);
   const [editingReservation, setEditingReservation] =
     useState<Reservation | null>(null);
 
-    useEffect(() => {
-      dispatch(getPatients());
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch(getPatients());
+  }, [dispatch]);
 
   const generateTimeOptions = () => {
     const times: string[] = [];
@@ -48,26 +48,45 @@ const ScheduleList: React.FC<ScheduleListProps> = () => {
     return times;
   };
   //  モーダルを開く共通関数
-  const openReservationModal = (record: TimeSlot, patient?: Patient) => {
+  const openReservationModal = (
+    record: TimeSlot,
+    mode: ModalMode,
+    patient?: Patient
+  ) => {
+    // まずはモーダルの表示状態をリセット
+    setEditingReservation(null);
+    setDroppedPatient(null);
+    form.resetFields();
+
+    // 共通フォーム初期値を設定
     form.setFieldsValue({
       time: `${record.hour}:${record.minute}`,
       date: record.date ? dayjs(record.date) : dayjs(),
       therapist_id: record.therapist_id,
     });
-    if (patient) {
-      setDroppedPatient(patient);
-    } else {
-      setDroppedPatient(null);
-    }
 
+    if (mode === "edit") {
+      // 編集モードの場合
+      if (record.reservations?.length) {
+        setEditingReservation(record.reservations[0]);
+      }
+
+      // 患者新規追加モードの場合
+    } else if (mode === "create") {
+      if (patient) {
+        setDroppedPatient(patient);
+        form.setFieldsValue({
+          patient_code: patient.patients_code,
+        });
+      }
+    }
     setIsModalVisible(true);
   };
 
   const handleRowDoubleClick = (record: TimeSlot) => {
     if (record.reservations?.length) {
-      //  undefined の場合を考慮
       setEditingReservation(record.reservations[0]);
-      openReservationModal(record);
+      openReservationModal(record, "edit");
       console.dir("クリックした項目:" + JSON.stringify(record, null, 2));
     }
   };
@@ -87,7 +106,7 @@ const ScheduleList: React.FC<ScheduleListProps> = () => {
       )
     );
 
-    openReservationModal(record, patient);
+    openReservationModal(record, "create", patient);
   };
 
   useEffect(() => {
@@ -97,10 +116,9 @@ const ScheduleList: React.FC<ScheduleListProps> = () => {
         droppedPatient.patients_name
       );
       form.setFieldsValue({
-        patientName: droppedPatient.patients_name,
+        patient_code: droppedPatient.patients_code,
       });
     }
-    console.log("🛠 Generated Time Slots:", generateTimeSlots());
   }, [isModalVisible, droppedPatient, dataSource, form]);
 
   return (

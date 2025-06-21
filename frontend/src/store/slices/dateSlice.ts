@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction, createSelector } from "@reduxjs/toolkit";
 import dayjs from "dayjs";
 import { RootState } from "@/store/index"; 
 
@@ -38,13 +38,22 @@ const dateSlice = createSlice({
 export const { setDateRange } = dateSlice.actions;
 
 //  Redux の `startDate` と `endDate` を取得するセレクター
-export const selectDateRange = (state: RootState) => ({
-  startDate: dayjs(state.date.startDate), 
-  endDate: dayjs(state.date.endDate),
-});
+// https://www.notion.so/createSelector-216fdcf6313680589b1ce26e27daafb8?source=copy_link
+export const selectDateRange = createSelector(
+  (state: RootState) => state.date.startDate,
+  (state: RootState) => state.date.endDate,
+  
+  (startDate, endDate) => ({
+    startDate: dayjs(startDate),
+    endDate: dayjs(endDate),
+  })
+);
 
-//  `selectedDates` を取得するセレクター
-export const selectSelectedDates = (state: RootState) =>
-  state.date.selectedDates.map((date: string) => dayjs(date));
+//  Redux の `selectedDates` を取得するセレクター
+//  https://www.notion.so/createSelector-216fdcf6313680589b1ce26e27daafb8?source=copy_link
 
+export const selectSelectedDates = createSelector(
+  (state: RootState) => state.date.selectedDates,
+  (selectedDates) => selectedDates.map((date: string) => dayjs(date))
+)
 export default dateSlice.reducer;

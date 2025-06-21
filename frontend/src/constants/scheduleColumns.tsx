@@ -1,4 +1,3 @@
-import React from "react";
 import { TimeSlot } from "@/utils/timeSlotGenerator";
 import { Tag } from "antd";
 import { Patient } from "@/types/patient";
