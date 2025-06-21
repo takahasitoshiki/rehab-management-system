@@ -60,7 +60,7 @@ const PatientReservationModal: React.FC<PatientReservationModalProps> = ({
       //編集モードのとき
       form.setFieldsValue({
         therapist_id: editingReservation.therapist_id, // セラピストID
-        patientName:editingReservation.patient_code, // 患者名
+        patient_code:editingReservation.patient_code, // 患者名
         date: editingReservation.date ? dayjs(editingReservation.date) : null, // 日付
         time: editingReservation.time, // 時間
         remarks: editingReservation.note, // 備考
