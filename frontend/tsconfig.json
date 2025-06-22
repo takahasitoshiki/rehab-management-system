@@ -7,7 +7,9 @@
     "esModuleInterop": true, // ESモジュールとの互換性を有効
     "skipLibCheck": true, // 型定義ファイルのチェックをスキップ
     "forceConsistentCasingInFileNames": true, // ファイル名の大文字小文字を強制
-    "moduleResolution": "node", // モジュール解決戦略
+    "allowImportingTsExtensions": true,
+    "noEmit": true, // ★この行を追加してください！
+    "moduleResolution": "bundler",
     "baseUrl": ".", // エイリアスの基準ディレクトリ
     "outDir": "./dist", // ここで出力先を指定
     "rootDir": "./src", // ソースのルート
