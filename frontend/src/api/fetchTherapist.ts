@@ -13,7 +13,7 @@ export const fetchTherapistList = async () => {
     return response.data || [];
   } catch (error) {
     console.error(" API呼び出しエラー:", error);
-    return []; // エラー時は空の配列を返す
+    return []; 
   }
 };
 
@@ -23,7 +23,7 @@ export const createTherapist = async (therapist: Therapist) => {
     return response.data;
   } catch (error) {
     console.error(" セラピストの登録ができませんでした:", error);
-    return null  ; // エラー時は空の配列を返す
+    return null  ; 
   }
 };
 
