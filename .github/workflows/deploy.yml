@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js for Frontend Build
         uses: actions/setup-node@v4 # Node.js環境をセットアップ
         with:
-          node-version: '18' # あなたのフロントエンドプロジェクトで使用しているNode.jsのバージョンに合わせてください
+          node-version: '18.20.6' # あなたのフロントエンドプロジェクトで使用しているNode.jsのバージョンに合わせてください
 
       - name: Install Frontend Dependencies
         run: |
