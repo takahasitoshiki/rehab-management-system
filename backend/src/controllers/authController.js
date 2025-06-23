@@ -1,6 +1,6 @@
 const User = require("../models/userModel.js");
 const jwt = require("jsonwebtoken");
-const { v4: uuidv4 } = require("uuid"); // ✅ 一意な ID を生成するために追加
+const { v4: uuidv4 } = require("uuid"); //一意な ID を生成するために追加
 const token = "トークン文字列";
 const decoded = jwt.decode(token);
 console.log("デコードされた JWT:", decoded);
@@ -76,26 +76,26 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ message: "ユーザーまたはパスワードが違います。" });
     }
 
-    // ✅ `JWT_SECRET` を環境変数から取得
+    //`JWT_SECRET` を環境変数から取得
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       console.error("エラー: JWT_SECRET が設定されていません！");
       return res.status(500).json({ message: "サーバー設定エラー。" });
     }
 
-    // ✅ `iat` (発行時間) を追加してトークンを一意にする
+    //`iat` (発行時間) を追加してトークンを一意にする
     const token = jwt.sign(
       {
         id: user._id,
         username: user.username,
-        sessionId: uuidv4(), // ✅ 毎回異なる一意な ID を生成
+        sessionId: uuidv4(), 
         iat: Math.floor(Date.now() / 1000),
       },
       jwtSecret,
       { expiresIn: "1h" }
     );
 
-    console.log("発行された JWT:", token); // ✅ ここで確認
+    console.log("発行された JWT:", token); //  ここで確認
     res.status(200).json({ message: "ログイン成功しました。", token });
   } catch (error) {
     console.error("ログインエラー:", error);
