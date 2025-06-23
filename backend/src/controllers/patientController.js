@@ -57,7 +57,7 @@ exports.registerPatient = async (req, res) => {
       patient: savedPatient,
     });
   } catch (error) {
-    console.error("💥 登録エラー:", error);
+    console.error(" 登録エラー:", error);
     res.status(500).json({
       error: "患者情報の登録に失敗しました",
       details: error.message,
