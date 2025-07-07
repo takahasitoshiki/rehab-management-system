@@ -10,7 +10,7 @@ import {
   Sending,
 } from "@/assets/icon";
 import "../../pages/Main/CustomHeader.css";
-import { DatePicker, Modal } from "antd";
+import { DatePicker, Modal, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { setDateRange, selectDateRange } from "@/store/slices/dateSlice";
 import PatientRegistrationContent from "../../components/main/headerBtnComponent/PatientRegistrationContent";
@@ -43,7 +43,6 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
 
-
   const buttonData: ButtonData[] = [
     {
       iconSrc: PatientRegistration,
@@ -53,14 +52,18 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
       ) as React.ReactElement,
     },
     {
+      iconSrc: Therapist,
+      altText: "セラピスト登録",
+      modalContent: (
+        <TherapistRegistrationContent
+        onClose={() => setIsModalVisible(false)}
+        />
+      ) as React.ReactElement,
+    },
+    {
       iconSrc: PatientIcon,
       altText: "患者一覧",
       sectionKey: "patients",
-    },
-    {
-      iconSrc: Therapist,
-      altText: "セラピスト登録",
-      modalContent:( <TherapistRegistrationContent onClose={() => setIsModalVisible(false)} />) as React.ReactElement,
     },
     {
       iconSrc: Reservation_List,
@@ -103,7 +106,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
   };
 
   const handleOk = () => {
-    setIsModalVisible(false); 
+    setIsModalVisible(false);
   };
 
   const handleCancel = () => {
@@ -116,7 +119,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
     if (dates && dates[0] && dates[1]) {
       dispatch(
         setDateRange({
-          startDate: dates[0].format("YYYY-MM-DD"), 
+          startDate: dates[0].format("YYYY-MM-DD"),
           endDate: dates[1].format("YYYY-MM-DD"),
         })
       );
@@ -140,33 +143,35 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ setVisibleSections }) => {
   };
 
   return (
-    <div className="header-container">
-      <div className="icon-group">
+    <div className='header-container'>
+      <div className='icon-group'>
         {buttonData.map((button: ButtonData, index: number) => (
-          <img
-            key={index}
-            src={button.iconSrc}
-            alt={button.altText}
-            className="icon"
-            onClick={() =>
-              handleIconClick(button.sectionKey, button.modalContent)
-            }
-          />
+          <Tooltip title={button.altText} key={index}>
+            <img
+              key={index}
+              src={button.iconSrc}
+              alt={button.altText}
+              className='icon'
+              onClick={() =>
+                handleIconClick(button.sectionKey, button.modalContent)
+              }
+            />
+          </Tooltip>
         ))}
       </div>
-      <div className="input-group">
-        <label htmlFor="period">期間</label>
+      <div className='input-group'>
+        <label htmlFor='period'>期間</label>
         <RangePicker
-          id="period"
-          onChange={handleDateChange} 
-          format="YYYY-MM-DD"
+          id='period'
+          onChange={handleDateChange}
+          format='YYYY-MM-DD'
           value={[startDate, endDate]} // Reduxの値を反映
           placeholder={["開始日", "終了日"]}
-          className="custom-range-picker"
+          className='custom-range-picker'
         />
       </div>
-      <button className="report-button" onClick={handleReportClick}>
-        <img src={Sending} alt="実績報告" className="button-icon" />
+      <button className='report-button' onClick={handleReportClick}>
+        <img src={Sending} alt='実績報告' className='button-icon' />
         実績報告
       </button>
 
